@@ -1,7 +1,9 @@
 import pygame
+from board import draw_board
 from constants import GameState, Colors
 from title import title_screen
 from loading import load_data, loading_screen
+from question import blit_text
 
 # load pygame screen
 pygame.init()
@@ -29,8 +31,11 @@ while game_state is not GameState.QUIT:
         if loading_thread is None:
             loading_thread = load_data()
         game_state = loading_screen(screen, loading_thread)
-    if game_state is GameState.MAIN:
+    if game_state is GameState.BOARD:
+        game_state = draw_board(screen, mouse_click)
+    if game_state is GameState.QUESTION:
         screen.fill(Colors.BLUE)
+        blit_text(screen, "This is a question")
 
     # Display screen
     pygame.display.flip()

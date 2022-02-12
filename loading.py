@@ -23,5 +23,5 @@ def loading_screen(screen, thread):
 
     # check if loading thread has exited
     if not thread.is_alive():
-        return GameState.MAIN
+        return GameState.BOARD
     return GameState.LOADING
