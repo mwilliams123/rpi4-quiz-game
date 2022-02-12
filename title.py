@@ -15,6 +15,6 @@ def title_screen(screen, mouse_click):
 
     # determine if start button clicked
     if mouse_click and text_rect.collidepoint(pygame.mouse.get_pos()):
-        return GameState.MAIN
+        return GameState.LOADING
 
     return GameState.TITLE
