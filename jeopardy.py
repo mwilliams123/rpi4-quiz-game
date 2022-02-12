@@ -1,18 +1,25 @@
 import pygame
-
-# color definitions
-BLUE = (6, 12, 233)
+from constants import GameState, Colors
 
 # load pygame screen
 pygame.init()
-screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
+screen = pygame.display.set_mode((700,700))
+game_state = GameState.TITLE
 
 # Main loop
-running = True
-while running:
+while game_state is not GameState.QUIT:
+    
+    # Detect events like key presses
     for event in pygame.event.get():
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
-                running = False
+                game_state = GameState.QUIT
+                
+    # Draw game
+    if game_state is GameState.TITLE:
+        screen.fill(Colors.BLUE)
+    
+    # Display screen
+    pygame.display.flip()
         
 pygame.quit()
