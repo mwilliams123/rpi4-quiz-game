@@ -7,3 +7,5 @@ class GameState(Enum):
 
 class Colors():
     BLUE = (6, 12, 233)
+    BLACK = (0, 0, 0)
+    WHITE = (255, 255, 255)
