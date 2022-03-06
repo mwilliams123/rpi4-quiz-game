@@ -1,8 +1,12 @@
 from constants import Colors
-import pygame 
+import pygame
 
-def blit_text(screen, text, color=Colors.WHITE):
-    font = pygame.font.SysFont("arial", 60)
+def draw_question(screen, store):
+    screen.fill(Colors.BLUE)
+    text = store['clue']
+    blit_text(screen, text)
+def blit_text(screen, text, color=Colors.WHITE, font_size=60):
+    font = pygame.font.SysFont("arial", font_size)
     words = [word.split(' ') for word in text.splitlines()]  # 2D array where each row is a list of words.
     space = font.size(' ')[0]  # The width of a space.
     max_width, max_height = screen.get_size()
