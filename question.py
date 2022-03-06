@@ -3,7 +3,7 @@ import pygame
 
 def draw_question(screen, store):
     screen.fill(Colors.BLUE)
-    text = store['clue']
+    text = store['clue']['answer']
     blit_text(screen, text)
 def blit_text(screen, text, color=Colors.WHITE, font_size=60):
     font = pygame.font.SysFont("arial", font_size)

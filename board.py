@@ -60,7 +60,7 @@ def draw_board(screen, mouse_click, store):
         print(i,j)
         clues = list(store['data'].values())[i-1]
         clue = clues[j-2]
-        store['clue'] = clue['answer']
+        store['clue'] = clue
         print(clue)
         return GameState.QUESTION, store
     return GameState.BOARD, store
