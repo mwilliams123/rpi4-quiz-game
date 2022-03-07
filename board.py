@@ -32,7 +32,7 @@ def draw_board(screen, mouse_click, store):
     # draw grid
     width, height = screen.get_size()
     v_lines = range(0,width, width//6)
-    h_lines = range(0,height, height//6+1)
+    h_lines = range(0,height, height//6)
     for i in v_lines:
         pygame.draw.line(screen, Colors.WHITE, (i, 0), (i, height))
     for i in h_lines:
@@ -54,13 +54,15 @@ def draw_board(screen, mouse_click, store):
         for i in range(7):
             if pos[0] < v_lines[i]:
                 break
-        for j in range(6):
+        for j in range(7):
             if pos[1] < h_lines[j]:
                 break
-        print(i,j)
+        print(j)
+        print(store['data'].values())
+        print(v_lines)
         clues = list(store['data'].values())[i-1]
         clue = clues[j-2]
         store['clue'] = clue
-        print(clue)
+        store['green'] = False
         return GameState.QUESTION, store
     return GameState.BOARD, store

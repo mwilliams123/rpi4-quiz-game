@@ -6,7 +6,8 @@ class GameState(Enum):
     MAIN = 2
     LOADING = 3
     QUESTION = 4
-    BOARD = 5 
+    BOARD = 5
+    ANSWER = 6
 
 class Colors():
     BLUE = (6, 12, 233)

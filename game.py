@@ -4,8 +4,8 @@ from constants import GameState, Colors
 from player_manager import PlayerManager
 from title import title_screen
 from loading import load_data, loading_screen
-from question import draw_question
-from hardware import green_light, ready
+from question import draw_question, draw_answer
+#from hardware import green_light, ready
 
 # load pygame screen
 pygame.init()
@@ -39,11 +39,13 @@ while game_state is not GameState.QUIT:
     if game_state is GameState.BOARD:
         game_state, store = draw_board(screen, mouse_click, store)
     if game_state is GameState.QUESTION:
-        if not green:
+        if not store['green']:
             pm.green_light()
-            green = True
-        game_state, store = pm.poll(screen, store)
+            store['green'] = True
+        game_state, store = pm.poll(store)
         draw_question(screen, store)
+    if game_state is GameState.ANSWER:
+        game_state = draw_answer(screen, store, pm, mouse_click)
     # Display screen
     pygame.display.flip()
         
