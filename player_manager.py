@@ -7,7 +7,12 @@ class PlayerManager():
         self.players = [Player(19, 6, 0, self), Player(16, 21, 1, self), Player(12, 17, 2, self)]
         self.timer = 5000
         self.clock = Clock()
-        self.stoplight = RGBLED(red=18, blue=24, green=23)
+        try:
+            self.stoplight = RGBLED(red=18, blue=24, green=23)
+        except:
+            class Object(object):
+                pass
+            self.stoplight = Object()
         self.stoplight.color = (0,0,0)
         self.control = 0 # who has control of the board
         self.ticks = 0

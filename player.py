@@ -1,4 +1,8 @@
-from gpiozero import Button, LED
+from gpiozero import Button, LED, Device
+from gpiozero.pins.mock import MockFactory
+
+if Device.pin_factory is None:
+    Device.pin_factory = MockFactory()
 # actions required for each player
 # 
 # instance variables: score, eligible_to_ring, active, buzzer 
