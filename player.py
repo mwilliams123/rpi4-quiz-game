@@ -1,8 +1,8 @@
 from gpiozero import Button, LED, Device
 from gpiozero.pins.mock import MockFactory
 
-if Device.pin_factory is None:
-    Device.pin_factory = MockFactory()
+# if Device.pin_factory is None:
+#     Device.pin_factory = MockFactory()
 # actions required for each player
 # 
 # instance variables: score, eligible_to_ring, active, buzzer 
@@ -53,7 +53,6 @@ class Player:
 
     def update_score (self, newScore):
         self.score += newScore
-        print("Player " + str(self.number) + " score: " + str(self.score))
         
         
     def update_timer(self, elapsedTime):

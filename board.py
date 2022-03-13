@@ -15,7 +15,7 @@ def draw_number(screen, num, rect, font):
     text_rect = text.get_rect(center=(rect[0] + rect[2]/2, rect[1] + rect[3]/2))
     screen.blit(text,text_rect)
 
-def draw_board(screen, mouse_click, store):
+def draw_board(screen, mouse_click, store, pm):
     screen.fill(Colors.BLUE)
     r = store['round']
 
@@ -25,6 +25,8 @@ def draw_board(screen, mouse_click, store):
         store['round'] = r + 1
         if store['round'] >= 2:
             return GameState.FINAL, store
+        else:
+            pm.update_control()
         return GameState.INTRO, store
 
     # draw grid
@@ -65,5 +67,7 @@ def draw_board(screen, mouse_click, store):
             store['clue'] = clue
             clues[j-2] = None # remove clue from board
             store['green'] = False
+            if clue['daily_double'] == 1:
+                return GameState.DAILY_DOUBLE, store
             return GameState.QUESTION, store
     return GameState.BOARD, store

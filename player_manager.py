@@ -2,6 +2,8 @@ from constants import GameState
 from player import Player
 from gpiozero import RGBLED
 from pygame.time import Clock
+import pygame
+
 class PlayerManager():
     def __init__(self):
         self.players = [Player(19, 6, 0, self), Player(16, 21, 1, self), Player(12, 17, 2, self)]
@@ -14,14 +16,18 @@ class PlayerManager():
                 pass
             self.stoplight = Object()
         self.stoplight.color = (0,0,0)
-        self.control = None # who has control of the board
+        self.rung_in = None
+        self.control = 0 # which player has control, starts w/ player 0
         self.ticks = 0
+        self.dd_wager = None
+        self.input = ''
 
     def green_light(self):
         self.stoplight.color = (0, 1, 0)
-        self.timer = 5000
+        self.timer = 5
         self.ticks = 0
-        self.control = None
+        self.rung_in = None
+        self.input = ''
         for p in self.players:
             p.eligible = True
 
@@ -49,12 +55,31 @@ class PlayerManager():
         return GameState.QUESTION, store
     
     def ring_in(self, player):
-        print(player)
-        self.control = player
+        self.rung_in = player
         for p in self.players:
             p.eligible = False
 
     def update(self, correct, value):
         # update player score
-        self.players[self.control].answer_question(correct, value)
+        self.players[self.rung_in].answer_question(correct, value)
+        # give control to player w/ correct answer
+        if correct:
+            self.control = self.rung_in
+        print("Control: " + str(self.control))
+            
+    def update_control(self):
+        # give control to player with lowest score at start of double jeopardy
+        lowest = float('inf')
+        for p in self.players:
+            if p.score < lowest:
+                lowest = p.score
+                self.control = p.number
+                
+    def update_input(self, event):
+        # update user input when key is pressed
+        if event.key == pygame.K_BACKSPACE:
+            self.input = self.input[:-1]
+        else:
+            self.input += event.unicode
+            
         

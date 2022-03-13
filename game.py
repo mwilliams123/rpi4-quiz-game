@@ -10,6 +10,7 @@ from categories import show_categories
 from util import load_fonts
 from score import display_score
 from final import final
+from daily_double import daily_double
 #from hardware import green_light, ready
 
 # load pygame screen
@@ -36,6 +37,8 @@ while game_state is not GameState.QUIT:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 game_state = GameState.QUIT
+            else:
+                pm.update_input(event)
         if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
             mouse_click = True
 
@@ -49,13 +52,15 @@ while game_state is not GameState.QUIT:
     if game_state is GameState.INTRO:
         game_state = show_categories(game_board, store)
     if game_state is GameState.BOARD:
-        game_state, store = draw_board(game_board, mouse_click, store)
+        game_state, store = draw_board(game_board, mouse_click, store, pm)
     if game_state is GameState.QUESTION:
         if not store['green']:
             pm.green_light()
             store['green'] = True
         game_state, store = pm.poll(store)
         draw_question(game_board, store)
+    if game_state is GameState.DAILY_DOUBLE:
+        game_state = daily_double(game_board, store, pm, mouse_click)
     if game_state is GameState.ANSWER:
         game_state = draw_answer(game_board, store, pm, mouse_click)
     if game_state is GameState.FINAL:

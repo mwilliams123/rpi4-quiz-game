@@ -10,6 +10,7 @@ class GameState(Enum):
     ANSWER = 6
     INTRO = 7
     FINAL = 8
+    DAILY_DOUBLE = 9
 
 class Colors():
     BLUE = (10, 20, 140) #(6, 12, 233)

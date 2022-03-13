@@ -1,13 +1,6 @@
 from constants import Colors, GameState
 import pygame
-from util import draw_text
-
-def draw_button(screen, text, pos):
-    font = pygame.font.SysFont("arial", 40)
-    text = font.render(text, True, Colors.WHITE)
-    rect = text.get_rect(center=pos)
-    screen.blit(text,rect)
-    return rect
+from util import draw_text, draw_button
 
 def draw_answer(screen, store, pm, mouse_click):
     screen.fill(Colors.BLUE)
@@ -15,7 +8,7 @@ def draw_answer(screen, store, pm, mouse_click):
     w, h = screen.get_size()
     draw_text(screen, text.upper(), store['fonts']['clue'], (100, 100, w-100, h-100))
     
-    if pm.control is None: 
+    if pm.rung_in is None: 
         rect = draw_button(screen, 'Continue', (w*1/2, h*3/4))
         if mouse_click and rect.collidepoint(pygame.mouse.get_pos()):
             return GameState.BOARD

@@ -8,6 +8,13 @@ def load_fonts():
     fonts['clue'] = pygame.font.Font('fonts/Caudex-Bold.ttf', 60)
     return fonts
 
+def draw_button(screen, text, pos):
+    font = pygame.font.SysFont("arial", 40)
+    text = font.render(text, True, Colors.WHITE)
+    rect = text.get_rect(center=pos)
+    screen.blit(text,rect)
+    return rect
+
 def draw_text(screen, text, font, rect):
     # draw multiline text centered in rect (left, top, right, bottom)
     words = text.split(' ') # 2D array where each row is a list of words.
