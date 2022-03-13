@@ -2,8 +2,13 @@ from constants import GameState
 from player import Player
 from gpiozero import RGBLED
 from pygame.time import Clock
+from pygame import mixer
+
+mixer.init()
+time_sound = mixer.Sound("Times-up.wav")
 class PlayerManager():
     def __init__(self):
+        
         self.players = [Player(19, 6, 0, self), Player(16, 21, 1, self), Player(12, 17, 2, self)]
         self.timer = 5000
         self.clock = Clock()
@@ -44,6 +49,7 @@ class PlayerManager():
         if not rungInYet and self.ticks > 1:
            self.timer -= et
            if self.timer <= 0:
+              self.sound_effects(1)
               return GameState.ANSWER, store   
              
         return GameState.QUESTION, store
@@ -57,4 +63,17 @@ class PlayerManager():
     def update(self, correct, value):
         # update player score
         self.players[self.control].answer_question(correct, value)
+
+    def sound_effects(self, type):
+        if (type == 1):
+        # play buzzer sound for player response expiration and no player buzz
+        # buzzer_sound and jeopardy_music variables assigned/loaded in game.py
+         #pygame.mixer.Sound("Times-up.wav")
+            time_sound.play()
+           
+          #pygame.mixer.music.stop()
+        #else:
+          #pygame.mixer.Sound.play(jeopardy_music)
+          #pygame.mixer.music.stop()
+
         
