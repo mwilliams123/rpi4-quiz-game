@@ -5,16 +5,25 @@ import pygame
 from constants import GameState, Colors
 
 data = {}
+
+def load_round(clues, r):
+    global data
+    data[r] = {}
+    for value in clues:
+        for clue in value:
+            if clue['category'] not in data[r]:
+                data[r][clue['category']] = []
+            data[r][clue['category']].append(clue)
+
 def fetch():
     global data
     r = requests.get('http://mathnerd7.pythonanywhere.com/api')
     data_json = r.json()
-    round1 = data_json['clues'][0]
-    for value in round1:
-        for clue in value:
-            if clue['category'] not in data:
-                data[clue['category']] = []
-            data[clue['category']].append(clue)
+    load_round(data_json['clues'][0], 0)
+    load_round(data_json['clues'][1], 1) # double jeopardy round
+    # final jeopardy
+    data['fj'] = data_json['fj']
+
 
 def load_data():
     t = threading.Thread(target=fetch)
@@ -34,6 +43,6 @@ def loading_screen(screen, thread, store = {}):
     # check if loading thread has exited
     if not thread.is_alive():
         store['data'] = data
-        print(data)
+        store['round'] = 0
         return GameState.BOARD, store
     return GameState.LOADING, store

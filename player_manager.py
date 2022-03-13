@@ -14,16 +14,15 @@ class PlayerManager():
                 pass
             self.stoplight = Object()
         self.stoplight.color = (0,0,0)
-        self.control = 0 # who has control of the board
+        self.control = None # who has control of the board
         self.ticks = 0
 
     def green_light(self):
-        #stoplight = RGBLED(red=18, blue=24, green=23)
         self.stoplight.color = (0, 1, 0)
         self.timer = 5000
         self.ticks = 0
+        self.control = None
         for p in self.players:
-            #tiebreaker
             p.eligible = True
 
     def poll(self, store):

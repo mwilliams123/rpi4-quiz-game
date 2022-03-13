@@ -8,8 +8,11 @@ class GameState(Enum):
     QUESTION = 4
     BOARD = 5
     ANSWER = 6
+    INTRO = 7
+    FINAL = 8
 
 class Colors():
-    BLUE = (6, 12, 233)
+    BLUE = (10, 20, 140) #(6, 12, 233)
     BLACK = (0, 0, 0)
     WHITE = (255, 255, 255)
+    GOLD = (244, 152, 70)
