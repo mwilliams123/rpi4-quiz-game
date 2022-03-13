@@ -60,8 +60,10 @@ def draw_board(screen, mouse_click, store):
             j += 1
         cat = list(store['data'][r].keys())[i-1]
         clues = store['data'][r][cat]
-        store['clue'] = clues[j-2]
-        clues[j-2] = None # remove clue from board
-        store['green'] = False
-        return GameState.QUESTION, store
+        clue = clues[j-2]
+        if clue is not None:
+            store['clue'] = clue
+            clues[j-2] = None # remove clue from board
+            store['green'] = False
+            return GameState.QUESTION, store
     return GameState.BOARD, store

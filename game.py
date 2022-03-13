@@ -1,4 +1,5 @@
 import pygame
+from pygame.time import Clock
 from board import draw_board
 from constants import GameState
 from player_manager import PlayerManager
@@ -8,6 +9,7 @@ from question import draw_question, draw_answer
 from categories import show_categories
 from util import load_fonts
 from score import display_score
+from final import final
 #from hardware import green_light, ready
 
 # load pygame screen
@@ -19,7 +21,11 @@ game_state = GameState.TITLE
 loading_thread = None
 green = False
 #ready()
-store = {}
+store = {
+    'wagers': False,
+    'timer': 30000,
+    'clock': Clock()
+}
 store['fonts'] = load_fonts()
 pm = PlayerManager()
 # Main loop
@@ -53,8 +59,7 @@ while game_state is not GameState.QUIT:
     if game_state is GameState.ANSWER:
         game_state = draw_answer(game_board, store, pm, mouse_click)
     if game_state is GameState.FINAL:
-        pass
-        #game_state = final(screen, store)
+        final(game_board, store, mouse_click)
     if game_state != GameState.TITLE and game_state != GameState.LOADING:
         display_score(score, store, pm)
     screen.blit(game_board, (0,0))

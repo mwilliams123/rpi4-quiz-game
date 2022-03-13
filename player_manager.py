@@ -36,7 +36,6 @@ class PlayerManager():
                 self.stoplight.color = (0,0,0)
                 p.update_timer(et)
                 if p.timer > 0:
-                    store['timer'] = p.timer
                     return GameState.QUESTION, store
                 else:
                     #question = store['clue']
