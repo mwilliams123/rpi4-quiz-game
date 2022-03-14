@@ -2,7 +2,7 @@ from constants import Colors
 from util import draw_text, play_speech
 import pygame
 
-def final(screen, store, mouse_click):
+def final(screen, store, pm, mouse_click):
     screen.fill(Colors.BLUE)
     w, h = screen.get_size()
     clue = store['data']['fj']
@@ -29,6 +29,7 @@ def final(screen, store, mouse_click):
             play_speech(clue['answer'])
             store['read'] = 2
         elif store['read'] == 2:
+            pm.sound_effects(3)
             store['read'] = 3
         else:
             store['timer'] = store['timer'] - et

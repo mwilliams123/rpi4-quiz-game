@@ -32,6 +32,7 @@ class PlayerManager():
         self.dd_wager = None
         self.input = ''
         self.read_text = True
+        self.dd_status = 0
 
     def green_light(self):
         self.stoplight.color = (0, 1, 0)
@@ -39,6 +40,7 @@ class PlayerManager():
         self.ticks = 0
         self.rung_in = None
         self.input = ''
+        self.dd_status = 0
         self.read_text = False
         for p in self.players:
             p.eligible = True
@@ -103,8 +105,4 @@ class PlayerManager():
         elif (type == 2):
             daily_double_sound.play()
         else:
-
-
-          
-
-        
+            final_sound.play()

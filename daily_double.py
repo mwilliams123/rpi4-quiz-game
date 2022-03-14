@@ -1,5 +1,5 @@
 from constants import GameState, Colors
-from util import draw_text
+from util import draw_text, play_speech
 from question import draw_question
 import pygame
 from util import draw_button, draw_text
@@ -9,7 +9,9 @@ from util import draw_button, draw_text
 def daily_double(screen, store, pm, mouse_click):
     w, h = screen.get_size()
     et = pm.clock.tick()
-    pm.sound_effects(0)
+    if pm.dd_status == 0:
+        pm.sound_effects(2)
+        pm.dd_status += 1
     if pm.dd_wager is None:
         screen.fill(Colors.BLUE)
         font = store['fonts']['number']
@@ -24,7 +26,7 @@ def daily_double(screen, store, pm, mouse_click):
         
         if mouse_click and rect.collidepoint(pygame.mouse.get_pos()) and pm.input.isdigit():
             pm.dd_wager = int(pm.input)
-            pm.timer = 10000
+            pm.timer = 6000
             pm.play_sound = True
             
         # display wager
@@ -33,7 +35,6 @@ def daily_double(screen, store, pm, mouse_click):
         screen.blit(text,rect)
         return GameState.DAILY_DOUBLE
     else:
-        pm.timer -= et
         if pm.timer < 0:
             if pm.play_sound:
                 pm.sound_effects(1)
@@ -56,5 +57,14 @@ def daily_double(screen, store, pm, mouse_click):
                     player.answer_question(False,pm.dd_wager)
                     return GameState.BOARD
         else:
+            if pm.dd_status == 1:
+                pm.dd_status += 1
+            elif pm.dd_status == 2:
+                play_speech(store['clue']['answer'])
+                pm.dd_status += 1
+            elif pm.dd_status == 3:
+                pm.dd_status += 1
+            else:
+                pm.timer -= et
             draw_question(screen, store)
     return GameState.DAILY_DOUBLE

@@ -25,7 +25,7 @@ green = False
 #ready()
 store = {
     'wagers': False,
-    'timer': 30000,
+    'timer': 35000,
     'clock': Clock(),
     'read': 0
 }
@@ -72,7 +72,7 @@ while game_state is not GameState.QUIT:
     if game_state is GameState.ANSWER:
         game_state = draw_answer(game_board, store, pm, mouse_click)
     if game_state is GameState.FINAL:
-        final(game_board, store, mouse_click)
+        final(game_board, store, pm, mouse_click)
     if game_state != GameState.TITLE and game_state != GameState.LOADING:
         display_score(score, store, pm)
     screen.blit(game_board, (0,0))
