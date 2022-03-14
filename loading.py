@@ -44,5 +44,5 @@ def loading_screen(screen, thread, store = {}):
     if not thread.is_alive():
         store['data'] = data
         store['round'] = 0
-        return GameState.BOARD, store
+        return GameState.INTRO, store
     return GameState.LOADING, store

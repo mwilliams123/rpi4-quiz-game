@@ -52,9 +52,13 @@ def daily_double(screen, store, pm, mouse_click):
                 player = pm.players[pm.control]
                 if correct_rect.collidepoint(pygame.mouse.get_pos()):
                     player.answer_question(True,pm.dd_wager)
+                    pm.dd_status = 0
+                    pm.dd_wager = None
                     return GameState.BOARD
                 if wrong_rect.collidepoint(pygame.mouse.get_pos()):
+                    pm.dd_status = 0
                     player.answer_question(False,pm.dd_wager)
+                    pm.dd_wager = None
                     return GameState.BOARD
         else:
             if pm.dd_status == 1:

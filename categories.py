@@ -8,7 +8,6 @@ def show_categories(screen, store):
     time.sleep(1)
     w, h = screen.get_size()
     r = store['round']
-    print(store['data'][r])
     for cat in store['data'][r]:
         screen.fill(Colors.BLUE)
         font = store['fonts']['number']
