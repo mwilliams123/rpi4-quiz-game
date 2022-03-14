@@ -4,9 +4,12 @@ from question import draw_question
 import pygame
 from util import draw_button, draw_text
 
+
+
 def daily_double(screen, store, pm, mouse_click):
     w, h = screen.get_size()
     et = pm.clock.tick()
+    pm.sound_effects(0)
     if pm.dd_wager is None:
         screen.fill(Colors.BLUE)
         font = store['fonts']['number']
