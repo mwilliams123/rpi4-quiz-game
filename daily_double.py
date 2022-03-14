@@ -22,6 +22,7 @@ def daily_double(screen, store, pm, mouse_click):
         if mouse_click and rect.collidepoint(pygame.mouse.get_pos()) and pm.input.isdigit():
             pm.dd_wager = int(pm.input)
             pm.timer = 10000
+            pm.play_sound = True
             
         # display wager
         text = font.render('$' + pm.input, True, Colors.WHITE)
@@ -31,6 +32,9 @@ def daily_double(screen, store, pm, mouse_click):
     else:
         pm.timer -= et
         if pm.timer < 0:
+            if pm.play_sound:
+                pm.sound_effects(1)
+                pm.play_sound = False
             screen.fill(Colors.BLUE)
             text = store['clue']['question']
             w, h = screen.get_size()

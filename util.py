@@ -1,6 +1,12 @@
 import pygame
 from constants import Colors
+from pydub import AudioSegment
+from pygame import mixer
+from gtts import gTTS
+from io import BytesIO
+import time 
 
+mixer.init()
 def load_fonts():
     fonts = {}
     fonts['number'] = pygame.font.Font('fonts/Anton-Regular.ttf', 60)
@@ -43,3 +49,19 @@ def draw_text(screen, text, font, rect):
         c = r.get_rect(center=(x, y))
         y += line_height
         screen.blit(r, c)
+
+def play_speech(text):
+    bytes_stream = BytesIO()
+    tts = gTTS(text)
+    tts.write_to_fp(bytes_stream)
+    bytes_stream.seek(0)
+    sound = AudioSegment.from_file(bytes_stream)
+    #sound_fast = sound._spawn(sound.raw_data, overrides={"frame_rate": int(sound.frame_rate*1.5)})
+    #sound_fast = sound.set_frame_rate(int(sound.frame_rate*0.8))
+    wav = sound.export(bytes_stream, format='wav')
+    sound = mixer.Sound(wav)
+    channel = sound.play()
+
+    # wait for sound to finish before exiting
+    while channel.get_busy():
+        time.sleep(0.1)

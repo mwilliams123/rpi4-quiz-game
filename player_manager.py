@@ -6,6 +6,8 @@ import pygame
 
 from pygame import mixer
 
+from util import play_speech
+
 mixer.init()
 time_sound = mixer.Sound("Times-up.wav")
 class PlayerManager():
@@ -26,13 +28,15 @@ class PlayerManager():
         self.ticks = 0
         self.dd_wager = None
         self.input = ''
+        self.read_text = True
 
     def green_light(self):
         self.stoplight.color = (0, 1, 0)
-        self.timer = 5
+        self.timer = 5000
         self.ticks = 0
         self.rung_in = None
         self.input = ''
+        self.read_text = False
         for p in self.players:
             p.eligible = True
 
@@ -49,6 +53,7 @@ class PlayerManager():
                 if p.timer > 0:
                     return GameState.QUESTION, store
                 else:
+                    self.sound_effects(1)
                     #question = store['clue']
                     return GameState.ANSWER, store
                 
@@ -87,8 +92,6 @@ class PlayerManager():
             self.input = self.input[:-1]
         else:
             self.input += event.unicode
-            
-        self.players[self.control].answer_question(correct, value)
 
     def sound_effects(self, type):
         if (type == 1):

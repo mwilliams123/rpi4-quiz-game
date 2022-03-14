@@ -7,10 +7,11 @@ from title import title_screen
 from loading import load_data, loading_screen
 from question import draw_question, draw_answer
 from categories import show_categories
-from util import load_fonts
+from util import load_fonts, play_speech
 from score import display_score
 from final import final
 from daily_double import daily_double
+
 #from hardware import green_light, ready
 
 # load pygame screen
@@ -25,7 +26,8 @@ green = False
 store = {
     'wagers': False,
     'timer': 30000,
-    'clock': Clock()
+    'clock': Clock(),
+    'read': 0
 }
 store['fonts'] = load_fonts()
 pm = PlayerManager()
@@ -50,14 +52,20 @@ while game_state is not GameState.QUIT:
             loading_thread = load_data()
         game_state, store = loading_screen(game_board, loading_thread, store)
     if game_state is GameState.INTRO:
-        game_state = show_categories(game_board, store)
+        game_state = show_categories(screen, store)
     if game_state is GameState.BOARD:
         game_state, store = draw_board(game_board, mouse_click, store, pm)
     if game_state is GameState.QUESTION:
         if not store['green']:
-            pm.green_light()
             store['green'] = True
-        game_state, store = pm.poll(store)
+            pm.read_text = True
+        elif pm.read_text:
+            text = store['clue']['answer']
+            play_speech(text)
+            pm.green_light()
+            pm.read_text = False
+        else:
+            game_state, store = pm.poll(store)
         draw_question(game_board, store)
     if game_state is GameState.DAILY_DOUBLE:
         game_state = daily_double(game_board, store, pm, mouse_click)

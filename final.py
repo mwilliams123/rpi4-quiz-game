@@ -1,5 +1,5 @@
 from constants import Colors
-from util import draw_text
+from util import draw_text, play_speech
 import pygame
 
 def final(screen, store, mouse_click):
@@ -22,8 +22,16 @@ def final(screen, store, mouse_click):
         rect = final_rect.get_rect(center=(w*1/2, h/4))
         screen.blit(final_rect,rect)
     else:
-        
-        store['timer'] = store['timer'] - et
+        if store['read'] == 0:
+            # draw
+            store['read'] = 1
+        elif store['read'] == 1:
+            play_speech(clue['answer'])
+            store['read'] = 2
+        elif store['read'] == 2:
+            store['read'] = 3
+        else:
+            store['timer'] = store['timer'] - et
         if store['timer'] < 0:
             text = clue['question']
         else:
