@@ -11,6 +11,7 @@ from util import play_speech
 mixer.init()
 daily_double_sound = mixer.Sound("Jeopardy-daily2x.wav")
 time_sound = mixer.Sound("Times-up.wav")
+final_sound = mixer.Sound("Final-Music.wav")
 
 class PlayerManager():
     def __init__(self):
@@ -99,8 +100,11 @@ class PlayerManager():
     def sound_effects(self, type):
         if (type == 1):
             time_sound.play() 
-        else:
+        elif (type == 2):
             daily_double_sound.play()
+        else:
+
+
           
 
         
