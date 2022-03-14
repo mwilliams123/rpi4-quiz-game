@@ -9,7 +9,9 @@ from pygame import mixer
 from util import play_speech
 
 mixer.init()
+daily_double_sound = mixer.Sound("Jeopardy-daily2x.wav")
 time_sound = mixer.Sound("Times-up.wav")
+
 class PlayerManager():
     def __init__(self):
         
@@ -60,7 +62,7 @@ class PlayerManager():
         if not rungInYet and self.ticks > 1:
            self.timer -= et
            if self.timer <= 0:
-              self.sound_effects(1)
+              time_sound.play()
               return GameState.ANSWER, store   
              
         return GameState.QUESTION, store
@@ -92,17 +94,13 @@ class PlayerManager():
             self.input = self.input[:-1]
         else:
             self.input += event.unicode
-
+            
+        
     def sound_effects(self, type):
         if (type == 1):
-        # play buzzer sound for player response expiration and no player buzz
-        # buzzer_sound and jeopardy_music variables assigned/loaded in game.py
-         #pygame.mixer.Sound("Times-up.wav")
-            time_sound.play()
-           
-          #pygame.mixer.music.stop()
-        #else:
-          #pygame.mixer.Sound.play(jeopardy_music)
-          #pygame.mixer.music.stop()
+            time_sound.play() 
+        else:
+            daily_double_sound.play()
+          
 
         
