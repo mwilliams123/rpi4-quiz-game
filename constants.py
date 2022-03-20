@@ -17,3 +17,4 @@ class Colors():
     BLACK = (0, 0, 0)
     WHITE = (255, 255, 255)
     GOLD = (244, 152, 70)
+    RED = (255,0,0)

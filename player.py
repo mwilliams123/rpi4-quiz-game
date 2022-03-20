@@ -1,6 +1,6 @@
 from gpiozero import Button, LED, Device
 from gpiozero.pins.mock import MockFactory
-
+import threading
 # if Device.pin_factory is None:
 #     Device.pin_factory = MockFactory()
 # actions required for each player
@@ -24,19 +24,24 @@ class Player:
        self.buzzer.when_pressed = self.buzz_in
        self.number = number
        self.manager = manager
-       
+       self.locked_out = False
        
 # 
 # have buzzed in so are active with light on
     def buzz_in(self):
-  
-       if (self.eligible):
+        if self.eligible and not self.locked_out:
            self.active = True
            self.led.on()
            self.manager.ring_in(self.number)
-           
+           self.timer = 5000
+        elif not self.locked_out:
+            self.locked_out = True
+            t = threading.Timer(0.25, self.unlock)
+            t.start()
   
-
+    def unlock(self):
+        print("unlock " + str(self.number))
+        self.locked_out = False
 # answer_question ()
 # determine if gave correct answer and update score
 

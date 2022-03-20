@@ -62,8 +62,10 @@ while game_state is not GameState.QUIT:
         elif pm.read_text:
             text = store['clue']['answer']
             play_speech(text)
-            pm.green_light()
+            
             pm.read_text = False
+            pm.clock.tick()
+            pm.green_light()
         else:
             game_state, store = pm.poll(store)
         draw_question(game_board, store)

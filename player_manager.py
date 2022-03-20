@@ -44,10 +44,12 @@ class PlayerManager():
         self.read_text = False
         for p in self.players:
             p.eligible = True
+            p.timer = 5000
 
     def poll(self, store):
         rungInYet = False
         et = self.clock.tick()
+        #print("elapsed time: " + str(et))
         self.ticks += 1
         for p in self.players:
            
@@ -55,6 +57,7 @@ class PlayerManager():
                 rungInYet = True
                 self.stoplight.color = (0,0,0)
                 p.update_timer(et)
+                #print("Player " + str(p.number) + " timer: " + str(p.timer))
                 if p.timer > 0:
                     return GameState.QUESTION, store
                 else:
@@ -64,9 +67,13 @@ class PlayerManager():
                 
         if not rungInYet and self.ticks > 1:
            self.timer -= et
+           #print("not rung in yet " + str(self.timer))
            if self.timer <= 0:
-              time_sound.play()
-              return GameState.ANSWER, store   
+                self.stoplight.color = (0,0,0)
+                for p in self.players:
+                    p.eligible = False
+                time_sound.play()
+                return GameState.ANSWER, store   
              
         return GameState.QUESTION, store
     
