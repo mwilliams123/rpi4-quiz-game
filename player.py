@@ -40,7 +40,6 @@ class Player:
             t.start()
   
     def unlock(self):
-        print("unlock " + str(self.number))
         self.locked_out = False
 # answer_question ()
 # determine if gave correct answer and update score

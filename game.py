@@ -12,8 +12,6 @@ from score import display_score
 from final import final
 from daily_double import daily_double
 
-#from hardware import green_light, ready
-
 # load pygame screen
 pygame.init()
 screen = pygame.display.set_mode((1300,700))
@@ -22,7 +20,6 @@ score = pygame.Surface((300, 700))
 game_state = GameState.TITLE
 loading_thread = None
 green = False
-#ready()
 store = {
     'wagers': False,
     'timer': 35000,

@@ -1,4 +1,3 @@
-from glob import glob
 import threading
 import requests
 import pygame

@@ -3,15 +3,12 @@ from player import Player
 from gpiozero import RGBLED
 from pygame.time import Clock
 import pygame
-
 from pygame import mixer
 
-from util import play_speech
-
 mixer.init()
-daily_double_sound = mixer.Sound("Jeopardy-daily2x.wav")
-time_sound = mixer.Sound("Times-up.wav")
-final_sound = mixer.Sound("Final-Music.wav")
+daily_double_sound = mixer.Sound("sounds/Jeopardy-daily2x.wav")
+time_sound = mixer.Sound("sounds/Times-up.wav")
+final_sound = mixer.Sound("sounds/Final-Music.wav")
 
 class PlayerManager():
     def __init__(self):
@@ -49,7 +46,6 @@ class PlayerManager():
     def poll(self, store):
         rungInYet = False
         et = self.clock.tick()
-        #print("elapsed time: " + str(et))
         self.ticks += 1
         for p in self.players:
            
@@ -57,7 +53,6 @@ class PlayerManager():
                 rungInYet = True
                 self.stoplight.color = (0,0,0)
                 p.update_timer(et)
-                #print("Player " + str(p.number) + " timer: " + str(p.timer))
                 if p.timer > 0:
                     return GameState.QUESTION, store
                 else:
@@ -67,7 +62,6 @@ class PlayerManager():
                 
         if not rungInYet and self.ticks > 1:
            self.timer -= et
-           #print("not rung in yet " + str(self.timer))
            if self.timer <= 0:
                 self.stoplight.color = (0,0,0)
                 for p in self.players:
@@ -88,7 +82,6 @@ class PlayerManager():
         # give control to player w/ correct answer
         if correct:
             self.control = self.rung_in
-        print("Control: " + str(self.control))
             
     def update_control(self):
         # give control to player with lowest score at start of double jeopardy
