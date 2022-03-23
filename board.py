@@ -1,5 +1,8 @@
-from constants import Colors, GameState
+"""
+Draw game board & clues
+"""
 import pygame
+from constants import Colors, GameState
 from util import draw_text
 
 def check_clues_left(clues):
@@ -15,18 +18,17 @@ def draw_number(screen, num, rect, font):
     text_rect = text.get_rect(center=(rect[0] + rect[2]/2, rect[1] + rect[3]/2))
     screen.blit(text,text_rect)
 
-def draw_board(screen, mouse_click, store, pm):
+def draw_board(screen, mouse_click, store, player_manager):
     screen.fill(Colors.BLUE)
-    r = store['round']
+    round_ = store['round']
 
     # check if all clues gone from board
-    if not check_clues_left(store['data'][r]):
+    if not check_clues_left(store['data'][round_]):
         # move to next round
-        store['round'] = r + 1
+        store['round'] = round_ + 1
         if store['round'] >= 2:
             return GameState.FINAL, store
-        else:
-            pm.update_control()
+        player_manager.update_control()
         return GameState.INTRO, store
 
     # draw grid
@@ -37,16 +39,16 @@ def draw_board(screen, mouse_click, store, pm):
         pygame.draw.line(screen, Colors.BLACK, (i, 0), (i, height), 5)
     for i in h_lines:
         pygame.draw.line(screen, Colors.BLACK, (0, i), (width, i), 5)
-    for i,x in enumerate(v_lines):
-        for j,y in enumerate(h_lines):
-            if j != 0 and list(store['data'][r].values())[i][j-1] != None:
-                draw_number(screen, j*200*(r+1), (x,y, width//6, height//6), store['fonts']['number'])
+    for i, x_pos in enumerate(v_lines):
+        for j, y_pos in enumerate(h_lines):
+            if j != 0 and list(store['data'][round_].values())[i][j-1] is not None:
+                draw_number(screen, j*200*(round_+1), (x_pos,y_pos, width//6, height//6), store['fonts']['number'])
 
     # draw categories
-    x = 0
-    for cat in store['data'][r]:
-        draw_text(screen, cat, store['fonts']['category'], (x + 5,0, x + width//6 - 5, height//6))
-        x += width//6 + 1
+    x_pos = 0
+    for cat in store['data'][round_]:
+        draw_text(screen, cat, store['fonts']['category'], (x_pos + 5,0, x_pos + width//6 - 5, height//6))
+        x_pos += width//6 + 1
     # get Q from pos of mouse
     if mouse_click:
         pos = pygame.mouse.get_pos()
@@ -60,8 +62,8 @@ def draw_board(screen, mouse_click, store, pm):
             if pos[1] < h_lines[j]:
                 break
             j += 1
-        cat = list(store['data'][r].keys())[i-1]
-        clues = store['data'][r][cat]
+        cat = list(store['data'][round_].keys())[i-1]
+        clues = store['data'][round_][cat]
         clue = clues[j-2]
         if clue is not None:
             store['clue'] = clue

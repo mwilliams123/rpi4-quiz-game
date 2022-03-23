@@ -1,6 +1,8 @@
+"""
+Title screen
+"""
 import pygame
 from constants import GameState, Colors
-
 
 def title_screen(screen, mouse_click):
     # background color
@@ -9,8 +11,8 @@ def title_screen(screen, mouse_click):
     # draw start button
     font = pygame.font.SysFont("arial", 60)
     text = font.render("Play", True, Colors.WHITE)
-    w, h = pygame.display.get_surface().get_size()
-    text_rect = text.get_rect(center=(w/2, h/2))
+    width, height = pygame.display.get_surface().get_size()
+    text_rect = text.get_rect(center=(width/2, height/2))
     screen.blit(text,text_rect)
 
     # determine if start button clicked

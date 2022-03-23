@@ -1,3 +1,6 @@
+"""
+Main Game Looop
+"""
 import pygame
 from pygame.time import Clock
 from board import draw_board
@@ -13,13 +16,13 @@ from final import final
 from daily_double import daily_double
 
 # load pygame screen
+# pylint: disable=no-member
 pygame.init()
 screen = pygame.display.set_mode((1300,700))
 game_board = pygame.Surface((1000, 700))
 score = pygame.Surface((300, 700))
 game_state = GameState.TITLE
 loading_thread = None
-green = False
 store = {
     'wagers': False,
     'timer': 35000,
@@ -27,7 +30,7 @@ store = {
     'read': 0
 }
 store['fonts'] = load_fonts()
-pm = PlayerManager()
+player_manager = PlayerManager()
 # Main loop
 while game_state is not GameState.QUIT:
     mouse_click = False
@@ -37,7 +40,7 @@ while game_state is not GameState.QUIT:
             if event.key == pygame.K_ESCAPE:
                 game_state = GameState.QUIT
             else:
-                pm.update_input(event)
+                player_manager.update_input(event)
         if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
             mouse_click = True
 
@@ -51,32 +54,31 @@ while game_state is not GameState.QUIT:
     if game_state is GameState.INTRO:
         game_state = show_categories(screen, store)
     if game_state is GameState.BOARD:
-        game_state, store = draw_board(game_board, mouse_click, store, pm)
+        game_state, store = draw_board(game_board, mouse_click, store, player_manager)
     if game_state is GameState.QUESTION:
         if not store['green']:
             store['green'] = True
-            pm.read_text = True
-        elif pm.read_text:
+            player_manager.read_text = True
+        elif player_manager.read_text:
             text = store['clue']['answer']
             play_speech(text)
-            
-            pm.read_text = False
-            pm.clock.tick()
-            pm.green_light()
+            player_manager.read_text = False
+            player_manager.clock.tick()
+            player_manager.green_light()
         else:
-            game_state, store = pm.poll(store)
+            game_state, store = player_manager.poll(store)
         draw_question(game_board, store)
     if game_state is GameState.DAILY_DOUBLE:
-        game_state = daily_double(game_board, store, pm, mouse_click)
+        game_state = daily_double(game_board, store, player_manager, mouse_click)
     if game_state is GameState.ANSWER:
-        game_state = draw_answer(game_board, store, pm, mouse_click)
+        game_state = draw_answer(game_board, store, player_manager, mouse_click)
     if game_state is GameState.FINAL:
-        final(game_board, store, pm, mouse_click)
+        final(game_board, store, player_manager, mouse_click)
     if game_state != GameState.TITLE and game_state != GameState.LOADING:
-        display_score(score, store, pm)
+        display_score(score, store, player_manager)
     screen.blit(game_board, (0,0))
     screen.blit(score, (1000,0))
     # Display screen
     pygame.display.flip()
-        
+
 pygame.quit()

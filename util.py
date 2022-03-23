@@ -1,16 +1,19 @@
+"""
+Utility functions
+"""
+import time
+from io import BytesIO
 import pygame
-from constants import Colors
 from pydub import AudioSegment
 from pygame import mixer
 from gtts import gTTS
-from io import BytesIO
-import time 
+from constants import Colors
 
 mixer.init()
 def load_fonts():
     fonts = {}
     fonts['number'] = pygame.font.Font('fonts/Anton-Regular.ttf', 60)
-    fonts['category'] = pygame.font.Font('fonts/Anton-Regular.ttf',24)
+    fonts['category'] = pygame.font.Font('fonts/Anton-Regular.ttf', 24)
     fonts['clue'] = pygame.font.Font('fonts/Caudex-Bold.ttf', 60)
     return fonts
 
@@ -43,12 +46,12 @@ def draw_text(screen, text, font, rect):
         text_rect = font.render(line, True, Colors.WHITE)
         height += line_height
         rects.append(text_rect)
-    y = (rect[1] + rect[3])/2 - height/2 + line_height/2
-    x = (rect[0] + rect[2]) // 2
-    for r in rects:
-        c = r.get_rect(center=(x, y))
-        y += line_height
-        screen.blit(r, c)
+    y_pos = (rect[1] + rect[3])/2 - height/2 + line_height/2
+    x_pos = (rect[0] + rect[2]) // 2
+    for rect in rects:
+        text_rect = rect.get_rect(center=(x_pos, y_pos))
+        y_pos += line_height
+        screen.blit(rect, text_rect)
 
 def play_speech(text):
     bytes_stream = BytesIO()

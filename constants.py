@@ -1,3 +1,6 @@
+"""
+Define color and game state constants
+"""
 from enum import Enum
 
 class GameState(Enum):

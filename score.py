@@ -1,5 +1,8 @@
-from constants import Colors
+"""
+Score Display
+"""
 import pygame
+from constants import Colors
 
 def draw_score(screen, rect, font, score, i, timer, active):
     text = font.render('$' + str(score), True, Colors.WHITE)
@@ -23,15 +26,15 @@ def draw_score(screen, rect, font, score, i, timer, active):
 
 
 
-def display_score(screen, store, pm):
+def display_score(screen, store, player_manager):
     width, height = screen.get_size()
     height = height / 3
     screen.fill(Colors.BLUE)
     font = store['fonts']['number']
-    for i,p in enumerate(pm.players):
+    for i,player in enumerate(player_manager.players):
         rect = (0, i*height, width, height) # left top right bottom
-        draw_score(screen, rect, font, p.score, i+1, p.timer, p.active)
-        if p.active:
+        draw_score(screen, rect, font, player.score, i+1, player.timer, player.active)
+        if player.active:
             pygame.draw.rect(screen, Colors.WHITE, (5, i*height+5, width-10, height-10), 10)
         pygame.draw.rect(screen, Colors.BLACK, rect, 5)
     
