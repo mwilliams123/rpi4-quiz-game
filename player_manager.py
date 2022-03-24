@@ -4,7 +4,10 @@ Manage player timers and input
 from pygame.time import Clock
 import pygame
 from pygame import mixer
-from gpiozero import RGBLED
+try:
+    from gpiozero import RGBLED
+except:
+    print("wrong hardware")
 from constants import GameState
 from player import Player
 
@@ -14,6 +17,8 @@ time_sound = mixer.Sound("sounds/Times-up.wav")
 final_sound = mixer.Sound("sounds/Final-Music.wav")
 
 class PlayerManager():
+    """_summary_
+    """
     def __init__(self):
         self.players = [Player(19, 6, 0, self), Player(16, 21, 1, self), Player(12, 17, 2, self)]
         self.timer = 5000
@@ -34,6 +39,7 @@ class PlayerManager():
         self.dd_status = 0
 
     def green_light(self):
+        """_summary_"""
         self.stoplight.color = (0, 1, 0)
         self.timer = 5000
         self.ticks = 0
@@ -46,6 +52,14 @@ class PlayerManager():
             player.timer = 5000
 
     def poll(self, store):
+        """_summary_
+
+        Args:
+            store (_type_): _description_
+
+        Returns:
+            _type_: _description_
+        """
         rung_in_yet = False
         elapsed_time = self.clock.tick()
         self.ticks += 1

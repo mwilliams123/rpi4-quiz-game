@@ -1,84 +1,82 @@
 """
-Main Game Looop
+Game Class
 """
 import pygame
-from pygame.time import Clock
-from board import draw_board
 from constants import GameState
+from util import display_score
 from player_manager import PlayerManager
-from title import title_screen
-from loading import load_data, loading_screen
-from question import draw_question, draw_answer
-from categories import show_categories
-from util import load_fonts, play_speech
-from score import display_score
-from final import final
-from daily_double import daily_double
 
-# load pygame screen
-# pylint: disable=no-member
-pygame.init()
-screen = pygame.display.set_mode((1300,700))
-game_board = pygame.Surface((1000, 700))
-score = pygame.Surface((300, 700))
-game_state = GameState.TITLE
-loading_thread = None
-store = {
-    'wagers': False,
-    'timer': 35000,
-    'clock': Clock(),
-    'read': 0
-}
-store['fonts'] = load_fonts()
-player_manager = PlayerManager()
-# Main loop
-while game_state is not GameState.QUIT:
-    mouse_click = False
-    # Detect events like key presses
-    for event in pygame.event.get():
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE:
-                game_state = GameState.QUIT
-            else:
-                player_manager.update_input(event)
-        if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-            mouse_click = True
+class Game():
+    """
+    Main game loop
 
-    # Draw game
-    if game_state is GameState.TITLE:
-        game_state = title_screen(game_board, mouse_click)
-    if game_state is GameState.LOADING:
-        if loading_thread is None:
-            loading_thread = load_data()
-        game_state, store = loading_screen(game_board, loading_thread, store)
-    if game_state is GameState.INTRO:
-        game_state = show_categories(screen, store)
-    if game_state is GameState.BOARD:
-        game_state, store = draw_board(game_board, mouse_click, store, player_manager)
-    if game_state is GameState.QUESTION:
-        if not store['green']:
-            store['green'] = True
-            player_manager.read_text = True
-        elif player_manager.read_text:
-            text = store['clue']['answer']
-            play_speech(text)
-            player_manager.read_text = False
-            player_manager.clock.tick()
-            player_manager.green_light()
+    Responsible for executing the game loop, handling events, and switching
+    between game states.
+    """
+    def __init__(self, screen, states, start_state=GameState.TITLE):
+        """Initialize Game object
+
+        Args:
+            states (_type_): _description_
+            start_state (_type_): _description_
+        """
+        self.screen = screen
+        self.game_board = pygame.Surface((1000, 700))
+        self.score_board = pygame.Surface((300, 700))
+        self.clock = pygame.time.Clock()
+        self.states = states
+        self.state = states[start_state]
+        self.player_manager = PlayerManager()
+        self.font = pygame.font.Font('fonts/Anton-Regular.ttf', 60)
+
+    def handle_events(self):
+        """Handles events like mouse clicks, keyboard presses."""
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    return True
+            self.state.handle_event(event)
+        return False
+
+    def change_state(self, next_state):
+        """Changes and to the next game state and passes store state data."""
+        print(next_state)
+        store = self.state.store
+        self.state = self.states[next_state]
+        self.state.startup(store)
+
+    def update(self, elapsed_time):
+        """
+        Calculates next game state
+
+        elapsed_time: milliseconds since last frame
+        """
+        next_state = self.state.update(self.player_manager, elapsed_time)
+        if next_state != self.state.name:
+            self.change_state(next_state)
+
+
+    def draw(self):
+        """Draw frame"""
+        if self.state.name in (GameState.TITLE, GameState.LOADING, GameState.INTRO):
+            self.state.draw(self.screen)
         else:
-            game_state, store = player_manager.poll(store)
-        draw_question(game_board, store)
-    if game_state is GameState.DAILY_DOUBLE:
-        game_state = daily_double(game_board, store, player_manager, mouse_click)
-    if game_state is GameState.ANSWER:
-        game_state = draw_answer(game_board, store, player_manager, mouse_click)
-    if game_state is GameState.FINAL:
-        final(game_board, store, player_manager, mouse_click)
-    if game_state != GameState.TITLE and game_state != GameState.LOADING:
-        display_score(score, store, player_manager)
-    screen.blit(game_board, (0,0))
-    screen.blit(score, (1000,0))
-    # Display screen
-    pygame.display.flip()
+            display_score(self.score_board, self.font, self.player_manager)
+            self.screen.blit(self.score_board, (1000,0))
+            self.state.draw(self.game_board)
+            self.screen.blit(self.game_board, (0,0))
 
-pygame.quit()
+
+    def run(self):
+        """
+        Main game loop
+        """
+        while self.state != GameState.QUIT:
+            elapsed_time = self.clock.tick()
+            quit_pressed = self.handle_events()
+            if quit_pressed:
+                break
+            self.draw()
+            self.update(elapsed_time)
+            # Display screen
+            pygame.display.flip()

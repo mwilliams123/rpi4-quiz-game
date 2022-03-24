@@ -5,46 +5,68 @@ import threading
 import requests
 import pygame
 from constants import GameState, Colors
+from state import State
 
-data = {}
+class LoadingScreen(State):
+    """Draws loading screen and loads questions."""
+    def __init__(self):
+        super(LoadingScreen, self).__init__()
+        self.name = GameState.LOADING
+        self.font = pygame.font.SysFont("arial", 60)
+        self.text = self.font.render("Loading...", True, Colors.WHITE)
+        width, _ = pygame.display.get_surface().get_size()
+        self.text_rect = self.text.get_rect(center=(width/2, 30))
+        self.data = {}
+        self.thread = None
 
-def load_round(clues, round_):
-    global data
-    data[round_] = {}
-    for value in clues:
-        for clue in value:
-            if clue['category'] not in data[round_]:
-                data[round_][clue['category']] = []
-            data[round_][clue['category']].append(clue)
+    def startup(self, store):
+        """
+        Called when a state resumes being active.
+        Allows information to be passed between states.
 
-def fetch():
-    global data
-    round_ = requests.get('http://mathnerd7.pythonanywhere.com/api')
-    data_json = round_.json()
-    load_round(data_json['clues'][0], 0)
-    load_round(data_json['clues'][1], 1) # double jeopardy round
-    # final jeopardy
-    data['fj'] = data_json['fj']
+        store: a dict passed from state to state
+        """
+        self.store = store
+        self.thread = threading.Thread(target=self.fetch)
+        self.thread.start()
 
+    def fetch(self):
+        # fetch data
+        round_ = requests.get('http://mathnerd7.pythonanywhere.com/api')
+        data_json = round_.json()
+        self.load_round(data_json['clues'][0], 0)
+        self.load_round(data_json['clues'][1], 1) # double jeopardy round
+        # final jeopardy
+        self.data['fj'] = data_json['fj']
 
-def load_data():
-    thread = threading.Thread(target=fetch)
-    thread.start()
-    return thread
+    def update(self, player_manager, elapsed_time):
+        """
+        Update the state. Called by the Game object once
+        per frame.
 
-def loading_screen(screen, thread, store):
-    global data
-    # Render loading screen
-    screen.fill(Colors.BLACK)
-    font = pygame.font.SysFont("arial", 60)
-    text = font.render("Loading...", True, Colors.WHITE)
-    width, _ = pygame.display.get_surface().get_size()
-    text_rect = text.get_rect(center=(width/2, 30))
-    screen.blit(text,text_rect)
+        dt: time since last frame
+        """
+        # check if loading thread has exited
+        if not self.thread.is_alive():
+            self.store['data'] = self.data
+            self.store['round'] = 0
+            return GameState.INTRO
+        return GameState.LOADING
 
-    # check if loading thread has exited
-    if not thread.is_alive():
-        store['data'] = data
-        store['round'] = 0
-        return GameState.INTRO, store
-    return GameState.LOADING, store
+    def draw(self, screen):
+        """
+        Draw everything to the screen.
+        """
+        # background color
+        screen.fill(Colors.BLACK)
+
+        # draw start button
+        screen.blit(self.text,self.text_rect)
+
+    def load_round(self, clues, round_):
+        self.data[round_] = {}
+        for value in clues:
+            for clue in value:
+                if clue['category'] not in self.data[round_]:
+                    self.data[round_][clue['category']] = []
+                self.data[round_][clue['category']].append(clue)
