@@ -65,8 +65,12 @@ class LoadingScreen(State):
 
     def load_round(self, clues, round_):
         self.data[round_] = {}
+        cats = []
+        for clue in clues[0]:
+            cats.append(clue['category'] )
         for value in clues:
-            for clue in value:
-                if clue['category'] not in self.data[round_]:
-                    self.data[round_][clue['category']] = []
-                self.data[round_][clue['category']].append(clue)
+            for i, clue in enumerate(value):
+                category = cats[i]
+                if category not in self.data[round_]:
+                    self.data[round_][category] = []
+                self.data[round_][category].append(clue)
