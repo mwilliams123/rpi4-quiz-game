@@ -1,7 +1,6 @@
 """
 Utility functions
 """
-import time
 from io import BytesIO
 import pygame
 from pydub import AudioSegment
@@ -9,20 +8,44 @@ from pygame import mixer
 from gtts import gTTS
 from constants import Colors
 
-mixer.init()
-def load_fonts():
-    fonts = {}
-    fonts['number'] = pygame.font.Font('fonts/Anton-Regular.ttf', 60)
-    fonts['category'] = pygame.font.Font('fonts/Anton-Regular.ttf', 24)
-    fonts['clue'] = pygame.font.Font('fonts/Caudex-Bold.ttf', 60)
-    return fonts
+class Fonts():
+    """Fonts"""
+    @classmethod
+    def load_fonts(cls):
+        cls.BUTTON = pygame.font.SysFont("arial", 40)
+        cls.CLUE = pygame.font.Font('fonts/Caudex-Bold.ttf', 60)
+        cls.NUMBER = pygame.font.Font('fonts/Anton-Regular.ttf', 60)
+        cls.CATEGORY = pygame.font.Font('fonts/Anton-Regular.ttf', 24)
 
-def draw_button(screen, text, pos):
-    font = pygame.font.SysFont("arial", 40)
-    text = font.render(text, True, Colors.WHITE)
-    rect = text.get_rect(center=pos)
-    screen.blit(text,rect)
-    return rect
+class SoundEffects():
+    """Sound effects"""
+    @classmethod
+    def load_sounds(cls):
+        mixer.init()
+        cls.daily_double_sound = mixer.Sound("sounds/Jeopardy-daily2x.wav")
+        cls.time_sound = mixer.Sound("sounds/Times-up.wav")
+        cls.final_sound = mixer.Sound("sounds/Final-Music.wav")
+
+    @classmethod
+    def play(cls, type_):
+        if type_ == 1:
+            cls.time_sound.play()
+        elif type_ == 2:
+            cls.daily_double_sound.play()
+        else:
+            cls.final_sound.play()
+
+class Button():
+    def __init__(self, text) -> None:
+        self.text = Fonts.BUTTON.render(text, True, Colors.WHITE)
+        self.rect = None
+
+    def was_clicked(self):
+        return self.rect is not None and self.rect.collidepoint(pygame.mouse.get_pos())
+
+    def draw(self, screen, pos):
+        self.rect = self.text.get_rect(center=pos)
+        screen.blit(self.text, self.rect)
 
 def draw_text(screen, text, font, rect):
     # draw multiline text centered in rect (left, top, right, bottom)
@@ -53,52 +76,21 @@ def draw_text(screen, text, font, rect):
         y_pos += line_height
         screen.blit(rect, text_rect)
 
-def play_speech(text):
-    bytes_stream = BytesIO()
-    tts = gTTS(text)
-    tts.write_to_fp(bytes_stream)
-    bytes_stream.seek(0)
-    sound = AudioSegment.from_file(bytes_stream)
-    #sound_fast = sound._spawn(sound.raw_data, overrides={"frame_rate": int(sound.frame_rate*1.5)})
-    #sound_fast = sound.set_frame_rate(int(sound.frame_rate*0.8))
-    wav = sound.export(bytes_stream, format='wav')
-    sound = mixer.Sound(wav)
-    channel = sound.play()
 
-    # wait for sound to finish before exiting
-    while channel.get_busy():
-        time.sleep(0.1)
+class TTS():
+    channel = None
 
+    @classmethod
+    def play_speech(cls, text):
+        bytes_stream = BytesIO()
+        tts = gTTS(text)
+        tts.write_to_fp(bytes_stream)
+        bytes_stream.seek(0)
+        sound = AudioSegment.from_file(bytes_stream)
+        wav = sound.export(bytes_stream, format='wav')
+        sound = mixer.Sound(wav)
+        cls.channel = sound.play()
 
-def draw_score(screen, rect, font, score, i, timer, active):
-    text = font.render('$' + str(score), True, Colors.WHITE)
-    text_rect = text.get_rect(center=((rect[0] + rect[2])/2, rect[1] + rect[3]*2/3))
-    screen.blit(text,text_rect)
-
-    text = font.render('Player ' + str(i), True, Colors.WHITE)
-    text_rect = text.get_rect(center=((rect[0] + rect[2])/2, rect[1] + rect[3]/4))
-    screen.blit(text,text_rect)
-
-    little_rect_width = rect[2]/9
-    for i in range(9):
-        color = Colors.BLACK
-        if active:
-            color = Colors.RED
-            if (i < 5 and 4 - timer / 1000 > i) or (i >= 5 and timer / 1000 +4 < i):
-                color = Colors.BLACK
-        #pygame.draw.rect(screen, Colors.WHITE, (5, i*height+5, width-10, height-10), 10)
-        pygame.draw.rect(screen, color, (rect[0] + little_rect_width*i,rect[1]-10 + rect[3] - 20, little_rect_width, 20))
-        pygame.draw.rect(screen,Colors.WHITE,(rect[0] + little_rect_width*i,rect[1]-10 + rect[3] - 20, little_rect_width, 20), 2)
-
-
-
-def display_score(screen, font, player_manager):
-    width, height = screen.get_size()
-    height = height / 3
-    screen.fill(Colors.BLUE)
-    for i,player in enumerate(player_manager.players):
-        rect = (0, i*height, width, height) # left top right bottom
-        draw_score(screen, rect, font, player.score, i+1, player.timer, player.active)
-        if player.active:
-            pygame.draw.rect(screen, Colors.WHITE, (5, i*height+5, width-10, height-10), 10)
-        pygame.draw.rect(screen, Colors.BLACK, rect, 5)
+    @classmethod
+    def is_busy(cls):
+        return cls.channel and cls.channel.get_busy()

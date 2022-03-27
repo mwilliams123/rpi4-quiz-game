@@ -2,9 +2,11 @@
 Load questions from API
 """
 import threading
+from unicodedata import category
 import requests
 import pygame
 from constants import GameState, Colors
+from util import Fonts
 from state import State
 
 class LoadingScreen(State):
@@ -12,8 +14,7 @@ class LoadingScreen(State):
     def __init__(self):
         super(LoadingScreen, self).__init__()
         self.name = GameState.LOADING
-        self.font = pygame.font.SysFont("arial", 60)
-        self.text = self.font.render("Loading...", True, Colors.WHITE)
+        self.text = Fonts.BUTTON.render("Loading...", True, Colors.WHITE)
         width, _ = pygame.display.get_surface().get_size()
         self.text_rect = self.text.get_rect(center=(width/2, 30))
         self.data = {}

@@ -3,15 +3,14 @@ Implement final jeopardy
 """
 import pygame
 from constants import Colors, GameState
-from util import draw_text, play_speech
+from util import SoundEffects, draw_text, TTS, Fonts
 from state import State
 
 class Final(State):
     """Draws question"""
     def __init__(self):
         super().__init__()
-        self.name = GameState.Final
-        self.font = pygame.font.Font('fonts/Caudex-Bold.ttf', 60)
+        self.name = GameState.FINAL
         self.show_answer = False
         self.clicked = False
         self.wait_for_wagers = True
@@ -46,20 +45,19 @@ class Final(State):
         clue = self.store['data']['fj']
         if self.wait_for_wagers:
             text = clue['category']
-            font = pygame.font.SysFont("arial", 40)
-            text_rect = font.render('Continue', True, Colors.WHITE)
+            text_rect = Fonts.BUTTON.render('Continue', True, Colors.WHITE)
             rect = text_rect.get_rect(center=(width*1/2, height*3/4))
             screen.blit(text_rect,rect)
-            final_rect = self.font.render('Final Jeopardy', True, Colors.GOLD)
+            final_rect = Fonts.NUMBER.render('Final Jeopardy', True, Colors.GOLD)
             rect = final_rect.get_rect(center=(width*1/2, height/4))
             screen.blit(final_rect,rect)
         elif not self.show_answer:
             if self.read_clue:
-                play_speech(clue['answer'])
+                TTS.play_speech(clue['answer'])
                 self.read_clue = False
             if self.play_sound:
-                player_manager.sound_effects(3)
+                SoundEffects.play(3)
                 self.play_sound = False
-            draw_text(screen, clue['answer'].upper(), self.font, (100, 100, width-100, height-100))
+            draw_text(screen, clue['answer'].upper(), Fonts.CLUE, (100, 100, width-100, height-100))
         else:
-            draw_text(screen, clue['question'].upper(), self.font, (100, 100, width-100, height-100))
+            draw_text(screen, clue['question'].upper(), Fonts.CLUE, (100, 100, width-100, height-100))

@@ -1,11 +1,9 @@
 """
 Display category intro
 """
-import time
-import pygame
 from constants import GameState, Colors
 from state import State
-from util import play_speech, draw_text
+from util import TTS, draw_text, Fonts
 
 class IntroScreen(State):
     """
@@ -14,7 +12,15 @@ class IntroScreen(State):
     def __init__(self):
         super().__init__()
         self.name = GameState.INTRO
-        self.font = pygame.font.Font('fonts/Anton-Regular.ttf', 60)
+        self.categories = []
+        self.index = 0
+
+    def startup(self, store):
+        self.store = store
+        TTS.play_speech("The categories are")
+        round_ = store['round']
+        print(store['data'][round_])
+        self.categories = list(store['data'][round_].keys())
 
     def update(self, player_manager, elapsed_time):
         """
@@ -23,20 +29,21 @@ class IntroScreen(State):
 
         dt: time since last frame
         """
-        return GameState.BOARD
+        if not TTS.is_busy():
+            if self.index >= len(self.categories):
+                return GameState.BOARD
+            text = self.categories[self.index]
+            comments = self.store['data'][self.store['round']][text][0]['comments']
+            if comments != '-':
+                text += ' ' + comments
+            TTS.play_speech(text)
+            self.index += 1
+
+        return GameState.INTRO
 
     def draw(self, screen):
         """Iterate through categories and explain each one"""
-        play_speech("The categories are")
-        time.sleep(1)
         width, height = screen.get_size()
-        round_ = self.store['round']
-        for cat in self.store['data'][round_]:
-            screen.fill(Colors.BLUE)
-            draw_text(screen, cat, self.font, (100, 100, width-100, height-100))
-            pygame.display.flip()
-            play_speech(cat)
-            comments = self.store['data'][round_][cat][0]['comments']
-            if comments != '-':
-                play_speech(comments)
-            time.sleep(0.25)
+        screen.fill(Colors.BLUE)
+        if self.index >= 1:
+            draw_text(screen, self.categories[self.index - 1], Fonts.NUMBER, (100, 100, width-100, height-100))

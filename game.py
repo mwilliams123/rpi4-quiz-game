@@ -3,7 +3,7 @@ Game Class
 """
 import pygame
 from constants import GameState
-from util import display_score
+from score import display_score
 from player_manager import PlayerManager
 
 class Game():
@@ -27,7 +27,6 @@ class Game():
         self.states = states
         self.state = states[start_state]
         self.player_manager = PlayerManager()
-        self.font = pygame.font.Font('fonts/Anton-Regular.ttf', 60)
 
     def handle_events(self):
         """Handles events like mouse clicks, keyboard presses."""
@@ -61,7 +60,7 @@ class Game():
         if self.state.name in (GameState.TITLE, GameState.LOADING, GameState.INTRO):
             self.state.draw(self.screen)
         else:
-            display_score(self.score_board, self.font, self.player_manager)
+            display_score(self.score_board, self.player_manager)
             self.screen.blit(self.score_board, (1000,0))
             self.state.draw(self.game_board)
             self.screen.blit(self.game_board, (0,0))

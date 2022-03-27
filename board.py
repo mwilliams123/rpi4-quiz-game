@@ -3,7 +3,7 @@ Draw game board & clues
 """
 import pygame
 from constants import Colors, GameState
-from util import draw_text
+from util import draw_text, Fonts
 from state import State
 
 class Board(State):
@@ -13,8 +13,6 @@ class Board(State):
     def __init__(self):
         super().__init__()
         self.name = GameState.BOARD
-        self.number_font = pygame.font.Font('fonts/Anton-Regular.ttf', 60)
-        self.font = pygame.font.Font('fonts/Anton-Regular.ttf', 24)
         self.clicked = False
         self.grid = ([], [])
 
@@ -94,13 +92,13 @@ class Board(State):
                 if j != 0 and list(self.store['data'][round_].values())[i][j-1] is not None:
                     self.draw_number(screen, j*200*(round_+1),
                                 (x_pos,y_pos, width//6, height//6),
-                                self.number_font)
+                                Fonts.NUMBER)
         self.grid = (h_lines, v_lines)
 
         # draw categories
         x_pos = 0
         for cat in self.store['data'][round_]:
-            draw_text(screen, cat, self.font, (x_pos + 5,0, x_pos + width//6 - 5, height//6))
+            draw_text(screen, cat, Fonts.CATEGORY, (x_pos + 5,0, x_pos + width//6 - 5, height//6))
             x_pos += width//6 + 1
 
     def check_clues_left(self, clues):

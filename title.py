@@ -3,6 +3,7 @@ Title screen
 """
 import pygame
 from constants import GameState, Colors
+from util import Fonts
 from state import State
 
 class TitleScreen(State):
@@ -10,8 +11,7 @@ class TitleScreen(State):
     def __init__(self):
         super().__init__()
         self.name = GameState.TITLE
-        self.font = pygame.font.SysFont("arial", 60)
-        self.text = self.font.render("Play", True, Colors.WHITE)
+        self.text = Fonts.BUTTON.render("Play", True, Colors.WHITE)
         width, height = pygame.display.get_surface().get_size()
         self.text_rect = self.text.get_rect(center=(width/2, height/2))
         self.start_clicked = False
