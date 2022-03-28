@@ -1,5 +1,10 @@
 """
-Game Class
+Launches the game and executes main game logic.
+
+Usage Example:
+    screen = pygame.display.set_mode()
+    game = Game(screen, {1: State(), 2: State()})
+    game.run()
 """
 import pygame
 from constants import GameState
@@ -8,17 +13,29 @@ from player_manager import PlayerManager
 
 class Game():
     """
-    Main game loop
+    Class that contains the main game logic.
 
     Responsible for executing the game loop, handling events, and switching
     between game states.
+
+    Attributes:
+        screen (Surface): Pygame display where game will be drawn
+        game_board (Surface): Pygame surface where game board will be drawn
+        score_board (Surface): Pygame surface where score will be drawn
+        clock (Clock): Pygame clock object that tracks time
+        states (dict of GameSate: State): Dictionary of all possible game states
+        state (State): The game's current state
+        player_manager (PlayerManager): A reference to the PlayerManager object
+            that keeps track of players
     """
     def __init__(self, screen, states, start_state=GameState.TITLE):
-        """Initialize Game object
+        """Initializes Game Object
 
         Args:
-            states (_type_): _description_
-            start_state (_type_): _description_
+            screen (Surface): Pygame display where game will be drawn
+            states (dict of GameSate: State): Dictionary of all possible game states
+            start_state (GameState, optional): name of state the game enters on launch.
+                Defaults to GameState.TITLE.
         """
         self.screen = screen
         self.game_board = pygame.Surface((1000, 700))
@@ -29,53 +46,61 @@ class Game():
         self.player_manager = PlayerManager()
 
     def handle_events(self):
-        """Handles events like mouse clicks, keyboard presses."""
+        """Handles events like mouse clicks, keyboard presses.
+
+        Returns:
+            boolean: True if game should exit, false otherwise
+        """
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
+                    # Exit game if escape key is pressed
                     return True
+            # pass along event to be handled by current state
             self.state.handle_event(event)
         return False
 
     def change_state(self, next_state):
-        """Changes and to the next game state and passes store state data."""
-        print(next_state)
+        """Changes state to the next game state and passes along persistent data."""
         store = self.state.store
         self.state = self.states[next_state]
         self.state.startup(store)
 
     def update(self, elapsed_time):
-        """
-        Calculates next game state
+        """Handles game logic and determines what the next game state should be
 
-        elapsed_time: milliseconds since last frame
+        Args:
+            elapsed_time (int): Milliseconds passed since the last time update() was called.
         """
         next_state = self.state.update(self.player_manager, elapsed_time)
         if next_state != self.state.name:
             self.change_state(next_state)
 
-
     def draw(self):
-        """Draw frame"""
+        """Draws the current frame to the screen."""
         if self.state.name in (GameState.TITLE, GameState.LOADING, GameState.INTRO):
             self.state.draw(self.screen)
         else:
+            # draw score board
             display_score(self.score_board, self.player_manager)
             self.screen.blit(self.score_board, (1000,0))
+            # draw the game board
             self.state.draw(self.game_board)
             self.screen.blit(self.game_board, (0,0))
 
-
     def run(self):
         """
-        Main game loop
+        Runs main game loop.
+
+        Each iteration will check for user inputs, render the game on screen,
+        and update the game state. Loop will run until game is quit.
         """
-        while self.state != GameState.QUIT:
-            elapsed_time = self.clock.tick()
+        while True:
             quit_pressed = self.handle_events()
             if quit_pressed:
                 break
             self.draw()
+            elapsed_time = self.clock.tick()
             self.update(elapsed_time)
             # Display screen
             pygame.display.flip()

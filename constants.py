@@ -4,7 +4,6 @@ Define color and game state constants
 from enum import Enum
 
 class GameState(Enum):
-    QUIT = 0
     TITLE = 1
     LOADING = 2
     QUESTION = 3

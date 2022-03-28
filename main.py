@@ -1,5 +1,7 @@
-"""
-Main Game Loop
+"""Entrypoint for launching RPI Quiz Game.
+
+  Usage Example:
+    $ python main.py
 """
 import pygame
 from board import Board
@@ -14,6 +16,7 @@ from title import TitleScreen
 from util import Fonts, SoundEffects
 
 def main():
+    """Initializes pygame display, loads resources, & launches game."""
     pygame.init()
     SoundEffects.load_sounds()
     Fonts.load_fonts()
