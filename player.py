@@ -33,6 +33,7 @@ class Player:
 
     def buzz_in(self):
         """ Called when player buzzes in. """
+        
         if self.eligible and not self.locked_out:
             self.active = True
             self.led.on()

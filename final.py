@@ -14,8 +14,9 @@ class Final(State):
         self.show_answer = False
         self.clicked = False
         self.wait_for_wagers = True
-        self.read_clue = True
-        self.play_sound = True
+        self.read_clue = False
+        self.play_sound = False
+        self.timer = 30000
 
     def handle_event(self, event):
         """
@@ -31,8 +32,22 @@ class Final(State):
 
         dt: time since last frame
         """
-        if self.clicked:
-            self.wait_for_wagers = False
+        clue = self.store['data']['fj']
+        if self.wait_for_wagers:
+            if self.clicked:
+                self.wait_for_wagers = False
+                self.read_clue = True
+        else:
+            if self.read_clue:
+                    TTS.play_speech(clue['answer'])
+                    self.read_clue = False
+                    self.play_sound = True
+            elif not TTS.is_busy() and self.play_sound:
+                SoundEffects.play(3)
+                self.play_sound = False
+            elif not SoundEffects.is_busy():
+                self.show_answer = True
+        
         return GameState.FINAL
 
     def draw(self, screen):
@@ -51,13 +66,13 @@ class Final(State):
             final_rect = Fonts.NUMBER.render('Final Jeopardy', True, Colors.GOLD)
             rect = final_rect.get_rect(center=(width*1/2, height/4))
             screen.blit(final_rect,rect)
+            # display category
+            final2_rect = Fonts.NUMBER.render(text, True, Colors.WHITE)
+            rect = final2_rect.get_rect(center = (width*1/2, height/2))
+            screen.blit(final2_rect, rect)
         elif not self.show_answer:
-            if self.read_clue:
-                TTS.play_speech(clue['answer'])
-                self.read_clue = False
-            if self.play_sound:
-                SoundEffects.play(3)
-                self.play_sound = False
+        #not self.show_answer:
             draw_text(screen, clue['answer'].upper(), Fonts.CLUE, (100, 100, width-100, height-100))
+           
         else:
             draw_text(screen, clue['question'].upper(), Fonts.CLUE, (100, 100, width-100, height-100))

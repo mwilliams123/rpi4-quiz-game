@@ -16,6 +16,7 @@ class IntroScreen(State):
         self.index = 0
 
     def startup(self, store):
+        self.index = 0
         self.store = store
         TTS.play_speech("The categories are")
         round_ = store['round']

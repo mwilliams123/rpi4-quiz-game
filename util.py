@@ -27,6 +27,9 @@ class SoundEffects():
         cls.final_sound = mixer.Sound("sounds/Final-Music.wav")
 
     @classmethod
+    def is_busy(cls):
+        return pygame.mixer.Channel(0).get_busy()
+    @classmethod
     def play(cls, type_):
         if type_ == 1:
             cls.time_sound.play()

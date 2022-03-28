@@ -39,7 +39,7 @@ class LoadingScreen(State):
         self.load_round(data_json['clues'][1], 1) # double jeopardy round
         # final jeopardy
         self.data['fj'] = data_json['fj']
-
+# 
     def update(self, player_manager, elapsed_time):
         """
         Update the state. Called by the Game object once
@@ -52,6 +52,7 @@ class LoadingScreen(State):
             self.store['data'] = self.data
             self.store['round'] = 0
             return GameState.INTRO
+            #return GameState.INTRO
         return GameState.LOADING
 
     def draw(self, screen):

@@ -67,12 +67,14 @@ class Question(State):
             self.timer -= elapsed_time
             if player_manager.rung_in is None:
                 if self.timer <= 0:
+                    player_manager.timer_expired_reset()
                     self.show_answer = True
                     SoundEffects.play(1)
             else:
                 self.rang_in = True
                 # wait for player response
                 if player_manager.poll(elapsed_time):
+                    player_manager.timer_expired_reset()
                     self.show_answer = True
 
         return GameState.QUESTION

@@ -11,7 +11,6 @@ class PlayerManager():
     """
     def __init__(self):
         self.players = [Player(19, 6, 0, self), Player(16, 21, 1, self), Player(12, 17, 2, self)]
-        self.timer = 5000
         self.clock = pygame.time.Clock()
         try:
             self.stoplight = gpiozero.RGBLED(red=18, blue=24, green=23)
@@ -32,6 +31,12 @@ class PlayerManager():
             player.eligible = True
             player.timer = 5000
 
+    def timer_expired_reset(self):
+        self.stoplight.color = (0,0,0)
+        for player in self.players:
+            player.eligible = False
+            player.led.off()
+
     def poll(self, elapsed_time):
         """_summary_
 
@@ -41,18 +46,14 @@ class PlayerManager():
         Returns:
             _type_: _description_
         """
-        if self.rung_in is not None:
-            self.stoplight.color = (0,0,0)
+        # start/count down player timer of player that rung in
+        # return true if player timer has expired
+        #self.timer -= elapsed_time
+        if self.players[self.rung_in].timer <= 0:
             return True
-        self.timer -= elapsed_time
-        if self.timer <= 0:
-            self.stoplight.color = (0,0,0)
-            for player in self.players:
-                player.eligible = False
-            SoundEffects.play(1)
-            return True
-
-        return False
+        else:
+            self.players[self.rung_in].update_timer(elapsed_time)
+            return False
 
     def ring_in(self, player):
         self.rung_in = player
