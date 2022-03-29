@@ -1,9 +1,20 @@
 """
-Define color and game state constants
+Define color and game state constants.
 """
 from enum import Enum
 
 class GameState(Enum):
+    """Enums which represent the current game state.
+
+    Attributes:
+        TITLE: The title screen
+        LOADING: The loading screen
+        QUESTION: Screen for displaying, answering individual questions
+        BOARD: The game board with clue values
+        DAILY_DOUBLE: Special question screen
+        INTRO: Category introduction screen
+        FINAL: Final question screen
+    """
     TITLE = 1
     LOADING = 2
     QUESTION = 3
@@ -13,7 +24,8 @@ class GameState(Enum):
     FINAL = 7
 
 class Colors():
-    BLUE = (10, 20, 140) #(6, 12, 233)
+    """Constants that represent colors with RGB values."""
+    BLUE = (10, 20, 140)
     BLACK = (0, 0, 0)
     WHITE = (255, 255, 255)
     GOLD = (244, 152, 70)

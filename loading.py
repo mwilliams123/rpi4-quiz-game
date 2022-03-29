@@ -1,71 +1,90 @@
 """
-Load questions from API
+Load questions from external API.
 """
 import threading
-from unicodedata import category
 import requests
-import pygame
 from constants import GameState, Colors
 from util import Fonts
 from state import State
 
 class LoadingScreen(State):
-    """Draws loading screen and loads questions."""
+    """Game State that draws loading screen and loads questions.
+
+    Attributes:
+        name (GameState): Enum that represents this game state
+        text (Surface): Pygame surface where loading text is drawn
+        data (dict of Any: dict): Nested dictionary of questions. Dictionary is indexed
+            by round (1,2, or 'fj'), and then indexed again by category (str). Each category
+            contains a list of question objects.
+        thread (Thread): a thread used to load data from the API
+    """
     def __init__(self):
-        super(LoadingScreen, self).__init__()
+        super().__init__()
         self.name = GameState.LOADING
         self.text = Fonts.BUTTON.render("Loading...", True, Colors.WHITE)
-        width, _ = pygame.display.get_surface().get_size()
-        self.text_rect = self.text.get_rect(center=(width/2, 30))
         self.data = {}
         self.thread = None
 
     def startup(self, store):
         """
-        Called when a state resumes being active.
-        Allows information to be passed between states.
+        Starts a new thread to fetch questions.
 
-        store: a dict passed from state to state
+        Args:
+            store (dict of str: Any): Dictionary of persistent data passed from state to state
         """
         self.store = store
         self.thread = threading.Thread(target=self.fetch)
         self.thread.start()
 
     def fetch(self):
-        # fetch data
-        round_ = requests.get('http://mathnerd7.pythonanywhere.com/api')
-        data_json = round_.json()
+        """Fetches questions from the API and formats them into rounds."""
+        data = requests.get('http://mathnerd7.pythonanywhere.com/api')
+        data_json = data.json()
         self.load_round(data_json['clues'][0], 0)
         self.load_round(data_json['clues'][1], 1) # double jeopardy round
         # final jeopardy
         self.data['fj'] = data_json['fj']
-# 
-    def update(self, player_manager, elapsed_time):
-        """
-        Update the state. Called by the Game object once
-        per frame.
 
-        dt: time since last frame
+    def update(self, player_manager, elapsed_time):
+        """Checks if data has finished loading from the API.
+
+        Args:
+            player_manager (PlayerManager): Reference to manager that keeps track of players
+            elapsed_time (int): Milliseconds that have passed since update() was last called
+
+        Returns:
+            GameState: Returns INTRO game state when questions have finished loading,
+                otherwise returns LOADING state.
         """
         # check if loading thread has exited
         if not self.thread.is_alive():
             self.store['data'] = self.data
             self.store['round'] = 0
             return GameState.INTRO
-            #return GameState.INTRO
         return GameState.LOADING
 
     def draw(self, screen):
         """
-        Draw everything to the screen.
+        Draws Loading text on simple background.
+
+        Args:
+            screen (Surface): Pygame display where frame will be drawn
         """
         # background color
         screen.fill(Colors.BLACK)
 
-        # draw start button
-        screen.blit(self.text,self.text_rect)
+        # draw loading text at top of screen
+        width, _ = screen.get_size()
+        text_rect = self.text.get_rect(center=(width/2, 30))
+        screen.blit(self.text, text_rect)
 
     def load_round(self, clues, round_):
+        """Organizes questions into a dictionary indexed by round and category.
+
+        Args:
+            clues (list of list): 2d array containing questions.
+            round_ (int): The questions' round number (1 or 2).
+        """
         self.data[round_] = {}
         cats = []
         for clue in clues[0]:

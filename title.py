@@ -12,7 +12,7 @@ class TitleScreen(State):
     Attributes:
         name (GameState): Enum that represents this game state
         play_button (Button): Button that can be clicked to start game
-        clicked (boolean): whether mouse has been clicked
+        clicked (boolean): whether the mouse has been clicked
         """
     def __init__(self):
         super().__init__()
@@ -35,8 +35,12 @@ class TitleScreen(State):
         Checks if start button has been clicked.
 
         Args:
-            player_manager (PlayerManager): reference to manager that keeps track of players
+            player_manager (PlayerManager): Reference to manager that keeps track of players
             elapsed_time (int): Milliseconds that have passed since update() was last called
+
+        Returns:
+            GameState: Returns LOADING state when start button was clicked, otherwise continues
+                to return TITLE state.
         """
         # determine if start button clicked
         if self.clicked and self.play_button.was_clicked():
