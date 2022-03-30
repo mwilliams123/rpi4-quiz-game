@@ -4,7 +4,7 @@ Load questions from external API.
 import threading
 import requests
 from constants import GameState, Colors
-from util import Fonts
+from util import Font
 from state import State
 
 class LoadingScreen(State):
@@ -21,7 +21,7 @@ class LoadingScreen(State):
     def __init__(self):
         super().__init__()
         self.name = GameState.LOADING
-        self.text = Fonts.BUTTON.render("Loading...", True, Colors.WHITE)
+        self.text = Font.button.render("Loading...", True, Colors.WHITE)
         self.data = {}
         self.thread = None
 

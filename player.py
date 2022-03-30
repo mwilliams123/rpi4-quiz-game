@@ -10,9 +10,7 @@ class Player:
     """Representation of a player and associated hardware in the game.
 
     Attributes:
-        active (boolean): True if player has rung in
         eligible (boolean): True when players are able to ring in after question is asked
-        timer (int): Time in milliseconds left to answer question
         score (int): Player's current score value
         number (int): Player's id number
         manager (PlayerManager): reference to the player manager object
@@ -27,10 +25,8 @@ class Player:
             number (int): Player's id number
             manager (PlayerManager): reference to the player manager object
         """
-        self.active = False
         self.eligible = False
         self.score = 0
-        self.timer = 5000
         self.number = number
         self.manager = manager
         self.locked_out = False
@@ -52,10 +48,8 @@ class Player:
 
         if self.eligible and not self.locked_out:
             # Player rung in successfully
-            self.active = True
             self.led.on()
             self.manager.ring_in(self.number)
-            self.timer = 5000
         elif not self.locked_out:
             # Player rung in too early, lock them out
             self.locked_out = True
@@ -68,32 +62,13 @@ class Player:
 
     def answer_question (self, correct, value):
         """Adds clue's dollar amount to player's score if answer is correct,
-        otherwise decrements their score. Resets player state.
+        otherwise decrements their score.
 
         Args:
             correct (boolean): Whether the question was answered correctly
             value (int): Dollar amount of question
         """
         if correct:
-            self.update_score(value)
+            self.score += value
         else:
-            self.update_score(-value)
-
-        self.active = False
-        self.timer = 5000
-
-    def update_score (self, amount):
-        """Increments or decrements player score by amount.
-
-        Args:
-            amount (int): dollar value player has lost or won.
-        """
-        self.score += amount
-
-    def update_timer(self, elapsed_time):
-        """Decrements player timer by specified amount.
-
-        Args:
-            elapsed_time (int): time that has passed in milliseconds
-        """
-        self.timer -= elapsed_time
+            self.score -= value

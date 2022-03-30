@@ -2,6 +2,8 @@
 Define color and game state constants.
 """
 from enum import Enum
+from dataclasses import dataclass
+
 
 class GameState(Enum):
     """Enums which represent the current game state.
@@ -23,7 +25,8 @@ class GameState(Enum):
     INTRO = 6
     FINAL = 7
 
-class Colors():
+@dataclass
+class Colors:
     """Constants that represent colors with RGB values."""
     BLUE = (10, 20, 140)
     BLACK = (0, 0, 0)

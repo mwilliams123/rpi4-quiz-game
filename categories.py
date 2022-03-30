@@ -3,7 +3,7 @@ Read aloud categories and explanations.
 """
 from constants import GameState, Colors
 from state import State
-from util import TTS, draw_text, Fonts
+from util import TTS, draw_text, Font
 
 class IntroScreen(State):
     """
@@ -61,5 +61,5 @@ class IntroScreen(State):
         width, height = screen.get_size()
         if self.index >= 1:
             # draw text centered on screen with 100px buffer.
-            draw_text(screen, self.categories[self.index - 1], Fonts.NUMBER,
+            draw_text(screen, self.categories[self.index - 1], Font.number,
                       (100, 100, width-100, height-100))

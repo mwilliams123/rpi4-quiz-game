@@ -8,22 +8,67 @@ from pygame import mixer
 from gtts import gTTS
 from constants import Colors
 
-class Fonts():
+class Font():
     """Fonts for rendered text.
 
     Attributes:
-        BUTTON (Font): for simple text like 'loading', and button text like 'continue'
-        CLUE (Font): for drawing clue questions and answers
-        NUMBER (Font): for drawing clue values, score values, or large category text
-        CATEGORY (Font): for drawing category titles
+        DEFAULT (int): for simple text like 'loading', and button text like 'continue'
+        CLUE (int): for drawing clue questions and answers
+        NUMBER (int): for drawing clue values, score values, or large category text
+        CATEGORY (int): for drawing category titles
         """
+    DEFAULT = 0
+    CLUE = 1
+    NUMBER = 2
+    CATEGORY = 3
+    _fonts = {}
     @classmethod
     def load_fonts(cls):
         """Loads fonts to be used in game."""
-        cls.BUTTON = pygame.font.SysFont("arial", 40)
-        cls.CLUE = pygame.font.Font('fonts/Caudex-Bold.ttf', 60)
-        cls.NUMBER = pygame.font.Font('fonts/Anton-Regular.ttf', 60)
-        cls.CATEGORY = pygame.font.Font('fonts/Anton-Regular.ttf', 24)
+        cls._fonts[cls.DEFAULT] = pygame.font.SysFont("arial", 40)
+        cls._fonts[cls.CLUE]= pygame.font.Font('fonts/Caudex-Bold.ttf', 60)
+        cls._fonts[cls.NUMBER] = pygame.font.Font('fonts/Anton-Regular.ttf', 60)
+        cls._fonts[cls.CATEGORY] = pygame.font.Font('fonts/Anton-Regular.ttf', 24)
+
+    @classmethod
+    def get_font(cls, font):
+        """Returns requested font, raises an error if font does not exist.
+
+        Args:
+            font (int): Enum that specifies font. Can be DEFAULT, CLUE, NUMBERR, or CATEGORY.
+
+        Raises:
+            NotFoundErr: If font has not been loaded yet.
+
+        """
+        if font in cls._fonts:
+            return cls._fonts[font]
+
+        raise FileNotFoundError('That font has not been loaded. Please try load_fonts() first.')
+
+    @classmethod
+    @property
+    def clue(cls):
+        """Getter for clue font."""
+        return cls.get_font(cls.CLUE)
+
+    @classmethod
+    @property
+    def button(cls):
+        """Getter for button font."""
+        return cls.get_font(cls.DEFAULT)
+
+    @classmethod
+    @property
+    def category(cls):
+        """Getter for category font."""
+        return cls.get_font(cls.CATEGORY)
+
+    @classmethod
+    @property
+    def number(cls):
+        """Getter for number font."""
+        return cls.get_font(cls.NUMBER)
 
 class SoundEffects():
     """Sound effects
@@ -72,7 +117,7 @@ class Button():
         Args:
             text (str): Text that goes on button
         """
-        self.text = Fonts.BUTTON.render(text, True, Colors.WHITE)
+        self.text = Font.button.render(text, True, Colors.WHITE)
         self.rect = None
 
     def was_clicked(self):
@@ -100,9 +145,7 @@ def draw_text(screen, text, font, rect):
             the text within. Bounds are pixel values relative to screen.
     """
     words = text.split(' ') # list of words
-    space = font.size(' ')[0]  # The width of a space
-    max_width = rect[2] - rect[0]
-    rects = [] # list of rectangles, where each box rectangles one line
+    rects = [] # list of rectangles, where each box contains one line
     height = 0 # total height of all lines
     i = 0
     while i < len(words):
@@ -112,24 +155,22 @@ def draw_text(screen, text, font, rect):
         i += 1
         while i < len(words):
             # keep adding words to line until it would exceed max width
-            word_len = font.size(words[i])[0]
-            if word_len + space + line_width > max_width:
+            word_len = font.size(words[i] + ' ')[0]
+            if word_len + line_width > rect[2] - rect[0]:
                 break
             line += ' ' + words[i]
-            line_width += word_len + space
+            line_width += word_len
             i += 1
         # render line to a rectangular surface
-        text_rect = font.render(line, True, Colors.WHITE)
+        rects.append(font.render(line, True, Colors.WHITE))
         height += line_height
-        rects.append(text_rect)
 
     # draw text rectangles
     y_pos = (rect[1] + rect[3])/2 - height/2 + line_height/2 # center vertically
     x_pos = (rect[0] + rect[2]) // 2 # center horizontally
-    for rect in rects:
-        text_rect = rect.get_rect(center=(x_pos, y_pos))
+    for text_rect in rects:
+        screen.blit(text_rect, text_rect.get_rect(center=(x_pos, y_pos)))
         y_pos += line_height
-        screen.blit(rect, text_rect)
 
 
 class TTS():

@@ -2,6 +2,7 @@
 Manager that keeps track of players and provides an easy interface
 for other classes to access/update player score and status.
 """
+from types import SimpleNamespace
 import gpiozero
 from player import Player
 
@@ -15,18 +16,18 @@ class PlayerManager():
             color is specified as (Red, Green, Blue) integer values between 0 and 1.
         ring_in (int): The id of the player who rung in
         control (int): The id of the player who has control of the board (picks the next question)
+        timer (int): Time in milliseconds left to answer question
     """
     def __init__(self):
         self.players = [Player(19, 6, 0, self), Player(16, 21, 1, self), Player(12, 17, 2, self)]
         try:
             self.stoplight = gpiozero.RGBLED(red=18, blue=24, green=23)
         except gpiozero.exc.PinPWMUnsupported:
-            class MockRGB():
-                """Mock hardware when not run on RPi."""
-            self.stoplight = MockRGB()
+            self.stoplight = SimpleNamespace() # create mock hardware
         self.stoplight.color = (0,0,0)
         self.rung_in = None
         self.control = 0
+        self.timer = 5000
 
     def green_light(self):
         """Turns on light to let players know they can ring in.
@@ -36,13 +37,13 @@ class PlayerManager():
         self.rung_in = None
         for player in self.players:
             player.eligible = True
-            player.timer = 5000
 
     def reset(self):
         """Prevents all players from ringing in, resets lights.
 
         Called after question is answered or timer has experied."""
         self.stoplight.color = (0,0,0)
+        self.timer = 5000
         for player in self.players:
             player.eligible = False
             player.led.off()
@@ -56,16 +57,20 @@ class PlayerManager():
         Returns:
             boolean: True if player timer has expired
         """
-        if self.players[self.rung_in].timer <= 0:
+        if self.timer <= 0:
             return True
 
         # count down timer of player that rung in
-        self.players[self.rung_in].update_timer(elapsed_time)
+        self.timer -= elapsed_time
         return False
 
-    def ring_in(self, player):
-        """Records first player to ring in and locks out other players."""
-        self.rung_in = player
+    def ring_in(self, player_id):
+        """Records first player to ring in and locks out other players.
+
+        Args:
+            player_id (int): Id number of player who rung in
+        """
+        self.rung_in = player_id
         for player in self.players:
             player.eligible = False
 
@@ -82,6 +87,7 @@ class PlayerManager():
         # give control to player with correct answer
         if correct:
             self.control = self.rung_in
+        self.rung_in = None
 
     def update_control(self):
         """Gives control to the player with the lowest score at start of second round."""

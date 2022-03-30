@@ -4,7 +4,7 @@ Implement Daily Double
 from collections import namedtuple
 import pygame
 from constants import GameState, Colors
-from util import TTS, SoundEffects, draw_text, Button, Fonts
+from util import TTS, SoundEffects, draw_text, Button, Font
 from state import State
 
 class DailyDouble(State):
@@ -111,22 +111,22 @@ class DailyDouble(State):
         width, height = screen.get_size()
         if self.wager is None:
             # Draw daily double text and continue button
-            text = Fonts.NUMBER.render('DAILY DOUBLE', True, Colors.GOLD)
+            text = Font.number.render('DAILY DOUBLE', True, Colors.GOLD)
             rect = text.get_rect(center=(width/2, height/4))
             screen.blit(text,rect)
             self.buttons.continue_button.draw(screen, (width*1/2, height*3/4))
             # display wagered amount
-            text = Fonts.NUMBER.render('$' + self.input, True, Colors.WHITE)
+            text = Font.number.render('$' + self.input, True, Colors.WHITE)
             rect = text.get_rect(center=(width/2, height/2))
             screen.blit(text,rect)
         elif self.timer <= 0:
             # draw answer
             text = self.store['clue']['question']
-            draw_text(screen, text.upper(), Fonts.CLUE, (100, 100, width-100, height-100))
+            draw_text(screen, text.upper(), Font.clue, (100, 100, width-100, height-100))
             # draw buttons
             self.buttons.correct_button.draw(screen, (width*1/4, height*3/4))
             self.buttons.wrong_button.draw(screen, (width*3/4, height*3/4))
         else:
             # draw clue
             text = self.store['clue']['answer']
-            draw_text(screen, text.upper(), Fonts.CLUE, (100, 100, width-100, height-100))
+            draw_text(screen, text.upper(), Font.clue, (100, 100, width-100, height-100))

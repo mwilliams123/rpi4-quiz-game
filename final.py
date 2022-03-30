@@ -3,7 +3,7 @@ Implement final jeopardy
 """
 import pygame
 from constants import Colors, GameState
-from util import SoundEffects, draw_text, TTS, Fonts
+from util import SoundEffects, draw_text, TTS, Font
 from state import State
 
 class Final(State):
@@ -80,18 +80,18 @@ class Final(State):
         width, height = screen.get_size()
         if self.wait_for_wagers:
             # display 'Final Jeopardy'
-            final_rect = Fonts.NUMBER.render('Final Jeopardy', True, Colors.GOLD)
+            final_rect = Font.number.render('Final Jeopardy', True, Colors.GOLD)
             rect = final_rect.get_rect(center=(width*1/2, height/4))
             screen.blit(final_rect,rect)
 
             # display category
-            cat_rect = Fonts.NUMBER.render(text, True, Colors.WHITE)
+            cat_rect = Font.number.render(text, True, Colors.WHITE)
             rect = cat_rect.get_rect(center = (width*1/2, height/2))
             screen.blit(cat_rect, rect)
 
             # display continue button
             text = clue['category']
-            text_rect = Fonts.BUTTON.render('Continue', True, Colors.WHITE)
+            text_rect = Font.button.render('Continue', True, Colors.WHITE)
             rect = text_rect.get_rect(center=(width*1/2, height*3/4))
             screen.blit(text_rect,rect)
         else:
@@ -100,4 +100,4 @@ class Final(State):
                 text = clue['question']
             else:
                 text = clue['answer']
-            draw_text(screen, text.upper(), Fonts.CLUE, (100, 100, width-100, height-100))
+            draw_text(screen, text.upper(), Font.clue, (100, 100, width-100, height-100))

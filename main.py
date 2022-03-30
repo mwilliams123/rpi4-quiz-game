@@ -13,13 +13,13 @@ from constants import GameState
 from loading import LoadingScreen
 from question import Question
 from title import TitleScreen
-from util import Fonts, SoundEffects
+from util import Font, SoundEffects
 
 def main():
     """Initializes pygame display, loads resources, & launches game."""
     pygame.init()
     SoundEffects.load_sounds()
-    Fonts.load_fonts()
+    Font.load_fonts()
     screen = pygame.display.set_mode((1300,700))
     game = Game(screen, {
         GameState.TITLE: TitleScreen(),

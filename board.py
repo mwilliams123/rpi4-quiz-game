@@ -3,7 +3,7 @@ Draw game board & clue values.
 """
 import pygame
 from constants import Colors, GameState
-from util import draw_text, Fonts
+from util import draw_text, Font
 from state import State
 
 class Board(State):
@@ -51,7 +51,7 @@ class Board(State):
         """
         # check if all clues gone from board
         round_ = self.store['round']
-        if not self.check_clues_left(self.store['data'][round_]):
+        if not self.check_clues_left(round_):
             # move to next round
             self.store['round'] = round_ + 1
             if self.store['round'] >= 2:
@@ -117,21 +117,22 @@ class Board(State):
         for i, x_pos in enumerate(vertical_lines):
             for j, y_pos in enumerate(horizontal_lines):
                 if j != 0 and list(self.store['data'][round_].values())[i][j-1] is not None:
-                    self.draw_number(screen, j*200*(round_+1), (x_pos,y_pos, width//6, height//6))
+                    draw_number(screen, j*200*(round_+1), (x_pos,y_pos, width//6, height//6))
 
         # draw categories
         x_pos = 0
         for category in self.store['data'][round_]:
-            draw_text(screen, category, Fonts.CATEGORY, (x_pos + 5, 0, x_pos + width//6 - 5,
+            draw_text(screen, category, Font.category, (x_pos + 5, 0, x_pos + width//6 - 5,
                       height//6))
             x_pos += width//6 + 1
 
-    def check_clues_left(self, clues):
+    def check_clues_left(self, round_):
         """Returns True if any clues are still left on board, False otherwise.
 
         Args:
-            clues (dict of list): Dictionary of all clues indexed by category.
+            rount_ (int): Current round number (1 or 2).
         """
+        clues = self.store['data'][round_]
         clues_left = False
         for category in clues:
             for clue in clues[category]:
@@ -139,16 +140,16 @@ class Board(State):
                     clues_left = True
         return clues_left
 
-    def draw_number(self, screen, num, rect):
-        """Draws the clue value on the board.
+def draw_number(screen, num, rect):
+    """Draws the clue value on the board.
 
-        Args:
-            screen (Surface): Pygame surface where board will be drawn
-            num (int): Dollar value of clue
-            rect (int, int, int, int): Rectangle (x,y, width, height) the clue value will be
-                centered inside. (x,y) is the pixel (relative to screen) of the top left
-                corner of the rectangle. Width and height are the dimensions.
-        """
-        text = Fonts.NUMBER.render('$' + str(num), True, Colors.GOLD)
-        text_rect = text.get_rect(center=(rect[0] + rect[2]/2, rect[1] + rect[3]/2))
-        screen.blit(text,text_rect)
+    Args:
+        screen (Surface): Pygame surface where board will be drawn
+        num (int): Dollar value of clue
+        rect (int, int, int, int): Rectangle (x,y, width, height) the clue value will be
+            centered inside. (x,y) is the pixel (relative to screen) of the top left
+            corner of the rectangle. Width and height are the dimensions.
+    """
+    text = Font.number.render('$' + str(num), True, Colors.GOLD)
+    text_rect = text.get_rect(center=(rect[0] + rect[2]/2, rect[1] + rect[3]/2))
+    screen.blit(text,text_rect)
