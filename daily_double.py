@@ -1,13 +1,11 @@
 """
 Implement Daily Double
 """
-from collections import namedtuple
-import pygame
 from constants import GameState, Colors
-from util import TTS, SoundEffects, draw_text, Button, Font
-from state import State
+from util import TTS, SoundEffects, draw_text, Font
+from state import InputState
 
-class DailyDouble(State):
+class DailyDouble(InputState):
     """Handles the implementation of Daily Double questions.
 
     Allows a player to enter a wager, then displays a question on screen. After
@@ -16,22 +14,13 @@ class DailyDouble(State):
 
     Attributes:
         name (GameState): Enum that represents this game state
-        clicked (boolean): whether the mouse has been clicked
         wager (int): Dollar amount the player would like to wager
-        input (str): Keystrokes the user has entered
-        buttons (Button, Button, Button): Continue, Correct, and Wrong buttons. Continue
-            button is clicked after wager is entered. Correct and Wrong buttons are clicked
-            after answer is given.
         timer (int): Milliseconds left to respond to question
     """
     def __init__(self):
         super().__init__()
         self.name = GameState.DAILY_DOUBLE
-        self.clicked = False
         self.wager = None
-        self.input = ''
-        ButtonList = namedtuple('ButtonsList',['continue_button', 'correct_button', 'wrong_button'])
-        self.buttons = ButtonList(Button('Continue'), Button('Correct'), Button('Incorrect'))
         self.timer = 6000
 
     def startup(self, store):
@@ -39,24 +28,7 @@ class DailyDouble(State):
         self.store = store
         self.clicked = False
         self.wager = None
-        self.input = ''
         self.timer = 6000
-
-    def handle_event(self, event):
-        """
-        Reads user input for daily double wager and sets flag when mouse is clicked.
-
-        Args:
-            event (Event): Pygame Event such as a mouse click or keyboard press.
-        """
-        if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-            self.clicked = True
-        elif event.type == pygame.KEYDOWN:
-            # update user input when key is pressed
-            if event.key == pygame.K_BACKSPACE:
-                self.input = self.input[:-1] # delete last digit
-            else:
-                self.input += event.unicode
 
     def update(self, player_manager, elapsed_time):
         """Checks if the user has made a wager, reads the question, and counts down the time a
@@ -83,13 +55,7 @@ class DailyDouble(State):
                 # Determine if player answered correctly based on which button was clicked
                 if self.clicked:
                     player = player_manager.players[player_manager.control]
-                    if self.buttons.correct_button.was_clicked():
-                        # update player score
-                        player.answer_question(True,self.wager)
-                        return GameState.BOARD
-                    if self.buttons.wrong_button.was_clicked():
-                        # update player score
-                        player.answer_question(False,self.wager)
+                    if self.answer_question(player):
                         return GameState.BOARD
             else:
                 # Count down time left to answer
@@ -123,9 +89,8 @@ class DailyDouble(State):
             # draw answer
             text = self.store['clue']['question']
             draw_text(screen, text.upper(), Font.clue, (100, 100, width-100, height-100))
-            # draw buttons
-            self.buttons.correct_button.draw(screen, (width*1/4, height*3/4))
-            self.buttons.wrong_button.draw(screen, (width*3/4, height*3/4))
+            # draw correct/incorrect buttons
+            self.draw_buttons(screen)
         else:
             # draw clue
             text = self.store['clue']['answer']
