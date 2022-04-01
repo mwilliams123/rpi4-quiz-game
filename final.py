@@ -1,9 +1,10 @@
 """
 Implement final jeopardy
 """
+from collections import namedtuple
 import pygame
 from constants import Colors, GameState
-from util import SoundEffects, draw_text, TTS, Font
+from util import SoundEffects, draw_text, TTS, Font, Button
 from state import State
 
 class Final(State):
@@ -27,6 +28,12 @@ class Final(State):
         self.clicked = False
         self.wait_for_wagers = True
         self.play_sound = False
+        self.input = ''
+        self.index = 0
+        ButtonList = namedtuple('ButtonsList',['continue_button', 'correct_button', 'wrong_button'])
+        self.buttons = ButtonList(Button('Continue'), Button('Correct'), Button('Incorrect'))
+        self.winner = None
+        self.players_by_score = []
 
     def handle_event(self, event):
         """
@@ -37,6 +44,12 @@ class Final(State):
         """
         if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
             self.clicked = True
+        elif event.type == pygame.KEYDOWN:
+            # update user input when key is pressed
+            if event.key == pygame.K_BACKSPACE:
+                self.input = self.input[:-1] # delete last digit
+            else:
+                self.input += event.unicode
 
     def update(self, player_manager, elapsed_time):
         """Checks if players have entered wagers, reads question, and plays final theme.
@@ -55,7 +68,7 @@ class Final(State):
                 self.wait_for_wagers = False
                 TTS.play_speech(clue['answer'])
                 self.play_sound = True
-        else:
+        elif not self.show_answer:
             if not TTS.is_busy() and self.play_sound:
                 # Wait for question to finish being read, then play final theme
                 SoundEffects.play(3)
@@ -63,7 +76,23 @@ class Final(State):
             elif not SoundEffects.is_busy():
                 # When final theme finishes, show the answer
                 self.show_answer = True
-
+                self.players_by_score = player_manager.sort_players()
+        if self.show_answer and self.winner is None:
+            player = self.players_by_score[self.index]
+            if self.clicked:
+                wager = int(self.input)
+                if self.buttons.correct_button.was_clicked():
+                    player.answer_question(True, wager)
+                    self.input = ''
+                    self.index += 1
+                if self.buttons.wrong_button.was_clicked():
+                    player.answer_question(False, wager)
+                    self.input = ''
+                    self.index += 1
+            if self.index >= len(self.players_by_score):
+                # show winner
+                self.winner = player_manager.get_winner()
+        self.clicked = False
         return GameState.FINAL
 
     def draw(self, screen):
@@ -85,19 +114,36 @@ class Final(State):
             screen.blit(final_rect,rect)
 
             # display category
+            text = clue['category']
             cat_rect = Font.number.render(text, True, Colors.WHITE)
             rect = cat_rect.get_rect(center = (width*1/2, height/2))
             screen.blit(cat_rect, rect)
 
             # display continue button
-            text = clue['category']
             text_rect = Font.button.render('Continue', True, Colors.WHITE)
             rect = text_rect.get_rect(center=(width*1/2, height*3/4))
             screen.blit(text_rect,rect)
         else:
             # Display either the question or answer depending on if time has run out
             if self.show_answer:
-                text = clue['question']
+                if self.winner is not None:
+                    text = "Player " + str(self.winner + 1) + " wins!"
+                    draw_text(screen, text, Font.number, (100, 100, width-100, height-100))
+                else:
+                    # draw answer
+                    text = clue['question']
+                    draw_text(screen, text.upper(), Font.clue, (100, 0, width-100, height/3))
+                    player = self.players_by_score[self.index].number
+                    text = "Player " + str(player + 1) + " wager:"
+                    draw_text(screen, text, Font.number, (100, height/3, width-100, height/2))
+                    # draw wagered amount
+                    text = Font.number.render('$' + self.input, True, Colors.WHITE)
+                    rect = text.get_rect(center=(width/2, height*3/5))
+                    screen.blit(text,rect)
+                    # draw correct/incorrect buttons
+                    self.buttons.correct_button.draw(screen, (width*1/4, height*3/4))
+                    self.buttons.wrong_button.draw(screen, (width*3/4, height*3/4))
             else:
+                # draw clue
                 text = clue['answer']
-            draw_text(screen, text.upper(), Font.clue, (100, 100, width-100, height-100))
+                draw_text(screen, text.upper(), Font.clue, (100, 100, width-100, height-100))

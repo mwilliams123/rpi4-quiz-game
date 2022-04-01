@@ -96,3 +96,22 @@ class PlayerManager():
             if player.score < lowest:
                 lowest = player.score
                 self.control = player.number
+
+    def get_winner(self):
+        "Returns id number of player with highest score."
+        highest = 0
+        winner = None
+        for player in self.players:
+            if player.score > highest:
+                highest = player.score
+                winner = player.number
+        return winner
+
+    def sort_players(self):
+        """Get list of players sorted according to final reveal order.
+
+        Returns:
+            list of Player: list Players with a score > 0, ascending by score
+        """
+        players = filter(lambda p: p.score > 0, self.players)
+        return sorted(players, key=lambda p: p.score)
