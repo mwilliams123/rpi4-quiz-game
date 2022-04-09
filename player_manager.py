@@ -35,6 +35,7 @@ class PlayerManager():
         Called immediately after a question is read."""
         self.stoplight.color = (0, 1, 0)
         self.rung_in = None
+        self.timer = 5000
         for player in self.players:
             player.eligible = True
 
@@ -43,7 +44,7 @@ class PlayerManager():
 
         Called after question is answered or timer has experied."""
         self.stoplight.color = (0,0,0)
-        self.timer = 5000
+        
         for player in self.players:
             player.eligible = False
             player.led.off()
