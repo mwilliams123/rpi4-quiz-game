@@ -31,7 +31,7 @@ def draw_score(screen, rect, player, timer, active):
         color = Colors.BLACK
         if active:
             color = Colors.RED
-            if (i < 5 and 4 - timer/1000 > i) or (i >= 5 and timer/1000 + 4 < i):
+            if (i < 5 and 4 - timer/1000 >= i) or (i >= 5 and timer/1000 + 4 < i):
                 color = Colors.BLACK
         pygame.draw.rect(screen, color,
             (rect[0] + little_rect_width*i, rect[1] + rect[3] - 30, little_rect_width, 20))
@@ -58,7 +58,7 @@ def display_score(screen, player_manager):
         draw_score(screen, rect, player, player_manager.timer, active)
         if active:
             # draw white outline
-            pygame.draw.rect(screen, Colors.WHITE, (5, i*height+5, width-10, box_height-10), 10)
+            pygame.draw.rect(screen, Colors.WHITE, (5, i*box_height+5, width-10, box_height-10), 10)
         # draw box outline
         pygame.draw.rect(screen, Colors.BLACK, rect, 5)
     
