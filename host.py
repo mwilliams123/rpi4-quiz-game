@@ -1,7 +1,11 @@
+"""Program for host to use when game to be run in hosted mode.
+In hosted mode a human as the host can see answers and rule on responses.
+"""
 import socket
 import pygame
 from host_screen import Host
 from util import Font
+
 def main():
     # get LAN address
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -27,7 +31,6 @@ def main():
             break
         print("receiving:")
         text = msg.decode()
-        print(text)
         host.startup()
         while True:
             quit_pressed = host.handle_event()

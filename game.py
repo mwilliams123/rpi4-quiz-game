@@ -88,7 +88,7 @@ class Game():
             self.state.draw(self.game_board)
             self.screen.blit(self.game_board, (0,0))
 
-    def run(self):
+    def run(self, hosted=False):
         """
         Runs main game loop.
 

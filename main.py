@@ -17,6 +17,7 @@ from util import Font, SoundEffects
 
 def main():
     """Initializes pygame display, loads resources, & launches game."""
+    hosted = False # whether game has a human host
     pygame.init()
     SoundEffects.load_sounds()
     Font.load_fonts()
@@ -30,7 +31,7 @@ def main():
         GameState.DAILY_DOUBLE: DailyDouble(),
         GameState.FINAL: Final(),
     })
-    game.run()
+    game.run(hosted)
     pygame.quit()
 
 

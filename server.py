@@ -1,6 +1,9 @@
 import socket
 import time
+
 class Server():
+    """Class for managing communication with Host when game is run in hosted mode.
+    """
     def __init__(self, port=8080):
         # get LAN address
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -16,7 +19,6 @@ class Server():
         self.client = client
 
     def send(self, msg):
-        print("sending")
         self.client.send(msg.encode())
 
     def close(self):
