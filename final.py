@@ -31,7 +31,7 @@ class Final(InputState):
         self.winner = None
         self.players_left = []
 
-    def update(self, player_manager, elapsed_time):
+    def update(self, player_manager, elapsed_time, host):
         """Checks if players have entered wagers, reads question, and plays final theme.
 
         Args:

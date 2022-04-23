@@ -19,7 +19,6 @@ def main():
     host = Host()
     quit_pressed = False
     screen = pygame.display.set_mode((1300,700))
-
     # connect to server
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((lan, 8080))
@@ -29,9 +28,9 @@ def main():
         msg = s.recv(512)
         if len(msg) <= 0:
             break
-        print("receiving:")
         text = msg.decode()
         host.startup()
+        msg = None
         while True:
             quit_pressed = host.handle_event()
             if quit_pressed:
@@ -39,10 +38,17 @@ def main():
             host.draw(screen, text)
             if host.update():
                 # button was clicked, send back
-                s.send(host.correct)
+                s.send(str(host.correct).encode())
                 break
             # Display screen
             pygame.display.flip()
+
+            if msg is None:
+                msg = s.recv(512).decode()
+                if msg == 'continue':
+                    host.timer_expired = True
+                elif msg == 'rangin':
+                    host.rang_in = True
 
     s.close()
 

@@ -23,14 +23,14 @@ class DailyDouble(InputState):
         self.wager = None
         self.timer = 6000
 
-    def startup(self, store):
+    def startup(self, store, host):
         SoundEffects.play(2) # daily double sound
         self.store = store
         self.clicked = False
         self.wager = None
         self.timer = 6000
 
-    def update(self, player_manager, elapsed_time):
+    def update(self, player_manager, elapsed_time, host):
         """Checks if the user has made a wager, reads the question, and counts down the time a
         player has left to answer. Also determines if the question was answered correctly or not.
 

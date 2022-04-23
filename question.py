@@ -2,6 +2,8 @@
 Show question on screen and get player response
 """
 from collections import namedtuple
+import re
+from urllib import response
 import pygame
 from constants import Colors, GameState
 from util import SoundEffects, draw_text, Button, TTS, Font
@@ -31,7 +33,7 @@ class Question(State):
         self.buttons = ButtonList(Button('Continue'), Button('Correct'), Button('Incorrect'))
         self.timer = 5000
 
-    def startup(self, store):
+    def startup(self, store, host):
         """Reads the question out loud and resets the timer.
 
         Args:
@@ -43,6 +45,9 @@ class Question(State):
         self.show_answer = False
         self.rang_in = False
         self.timer = 5000
+        if host is not None:
+            # send answer to host
+            host.send(store['clue']['question'])
 
     def handle_event(self, event):
         """
@@ -54,7 +59,7 @@ class Question(State):
         if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
             self.clicked = True
 
-    def update(self, player_manager, elapsed_time):
+    def update(self, player_manager, elapsed_time, host):
         """Checks if players have rung in or time has expired for the question to be answered.
         Waits for user to click a button to return to board.
 
@@ -94,15 +99,33 @@ class Question(State):
                 if self.timer <= 0:
                     # no one rung in
                     player_manager.reset()
-                    self.show_answer = True
                     SoundEffects.play(1) # time's up
+                    if host is not None:
+                        host.send("continue")
+                        # wait for host to continue
+                        resp = host.wait()
+                        if resp:
+                            print(resp)
+                            return GameState.BOARD
+                    else:
+                        self.show_answer = True
             else:
                 # player rang in, wait for response
                 self.rang_in = True
                 if player_manager.poll(elapsed_time):
                     # player has answered question
                     player_manager.reset()
-                    self.show_answer = True
+                    if host is not None:
+                        host.send("rangin")
+                        resp = host.wait()
+                        if resp == "True":
+                            player_manager.update(True,self.store['clue']['value'])
+                            return GameState.BOARD
+                        if resp == "False":
+                            player_manager.update(False,self.store['clue']['value'])
+                            return GameState.BOARD
+                    else:
+                        self.show_answer = True
         self.clicked = False # reset flag
         return GameState.QUESTION
 

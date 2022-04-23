@@ -21,13 +21,10 @@ class Server():
     def send(self, msg):
         self.client.send(msg.encode())
 
+    def wait(self):
+        print("waiting for response")
+        resp = self.client.recv(512).decode()
+        return resp
+
     def close(self):
         self.server.close()
-
-# test
-print("starting server")
-server = Server()
-server.send('test')
-
-time.sleep(60)
-server.close()

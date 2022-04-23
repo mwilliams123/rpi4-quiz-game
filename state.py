@@ -23,7 +23,7 @@ class State():
     def __init__(self):
         self.store = {}
 
-    def startup(self, store):
+    def startup(self, store, host):
         """
         Executes once immediately after a state is transitioned into.
 
@@ -40,7 +40,7 @@ class State():
             event (Event): Pygame Event such as a mouse click or keyboard press.
         """
 
-    def update(self, player_manager, elapsed_time):
+    def update(self, player_manager, elapsed_time, host):
         """Handles game logic.
 
         Called by the Game object once per frame. Should return the next game state.

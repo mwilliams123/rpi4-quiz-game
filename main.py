@@ -17,12 +17,12 @@ from util import Font, SoundEffects
 
 def main():
     """Initializes pygame display, loads resources, & launches game."""
-    hosted = False # whether game has a human host
+    hosted = True # whether game has a human host
     pygame.init()
     SoundEffects.load_sounds()
     Font.load_fonts()
     screen = pygame.display.set_mode((1300,700))
-    game = Game(screen, {
+    game = Game(screen, hosted, {
         GameState.TITLE: TitleScreen(),
         GameState.LOADING: LoadingScreen(),
         GameState.INTRO: IntroScreen(),
@@ -31,7 +31,7 @@ def main():
         GameState.DAILY_DOUBLE: DailyDouble(),
         GameState.FINAL: Final(),
     })
-    game.run(hosted)
+    game.run()
     pygame.quit()
 
 

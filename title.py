@@ -30,7 +30,7 @@ class TitleScreen(State):
         if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
             self.clicked = True
 
-    def update(self, player_manager, elapsed_time):
+    def update(self, player_manager, elapsed_time, host):
         """
         Checks if start button has been clicked.
 

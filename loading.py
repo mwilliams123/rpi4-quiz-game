@@ -25,7 +25,7 @@ class LoadingScreen(State):
         self.data = {}
         self.thread = None
 
-    def startup(self, store):
+    def startup(self, store, host):
         """
         Starts a new thread to fetch questions.
 
@@ -45,7 +45,7 @@ class LoadingScreen(State):
         # final jeopardy
         self.data['fj'] = data_json['fj']
 
-    def update(self, player_manager, elapsed_time):
+    def update(self, player_manager, elapsed_time, host):
         """Checks if data has finished loading from the API.
 
         Args:
