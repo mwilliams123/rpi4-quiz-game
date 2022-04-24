@@ -30,6 +30,13 @@ class Final(InputState):
         self.play_sound = False
         self.winner = None
         self.players_left = []
+        self.hosted = False
+
+    def startup(self, store, host):
+        self.store = store
+        if host is not None:
+            # send answer to host
+            self.hosted = True
 
     def update(self, player_manager, elapsed_time, host):
         """Checks if players have entered wagers, reads question, and plays final theme.
@@ -55,6 +62,8 @@ class Final(InputState):
                 self.play_sound = False
             elif not SoundEffects.is_busy():
                 # When final theme finishes, show the answer
+                if host is not None:
+                    host.send(clue['question'])
                 self.show_answer = True
                 self.players_left = player_manager.sort_players()
         if self.show_answer and self.winner is None:
@@ -103,8 +112,9 @@ class Final(InputState):
                     draw_text(screen, text, Font.number, (100, 100, width-100, height-100))
                 else:
                     # draw answer
-                    text = clue['question']
-                    draw_text(screen, text.upper(), Font.clue, (100, 0, width-100, height/3))
+                    if not self.hosted:
+                        text = clue['question']
+                        draw_text(screen, text.upper(), Font.clue, (100, 0, width-100, height/3))
                     player = self.players_left[0].number
                     text = "Player " + str(player + 1) + " wager:"
                     draw_text(screen, text, Font.number, (100, height/3, width-100, height/2))
