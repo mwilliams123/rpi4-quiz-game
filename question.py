@@ -109,12 +109,13 @@ class Question(State):
                         self.show_answer = True
             else:
                 # player rang in, wait for response
-                self.rang_in = True
+                if not self.rang_in:
+                    host.send("rangin")
+                    self.rang_in = True
                 if player_manager.poll(elapsed_time):
                     # player has answered question
                     player_manager.reset()
                     if host is not None:
-                        host.send("rangin")
                         resp = host.wait()
                         if resp == "True":
                             player_manager.update(True,self.store['clue']['value'])
