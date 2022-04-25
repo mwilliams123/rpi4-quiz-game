@@ -2,8 +2,6 @@
 Show question on screen and get player response
 """
 from collections import namedtuple
-import re
-from urllib import response
 import pygame
 from constants import Colors, GameState
 from util import SoundEffects, draw_text, Button, TTS, Font
@@ -123,7 +121,8 @@ class Question(State):
                             return GameState.BOARD
                         if resp == "False":
                             player_manager.update(False,self.store['clue']['value'])
-                            return GameState.BOARD
+                            self.timer = 4999
+                            return GameState.QUESTION
                     else:
                         self.show_answer = True
         self.clicked = False # reset flag

@@ -88,6 +88,14 @@ class PlayerManager():
         # give control to player with correct answer
         if correct:
             self.control = self.rung_in
+        else:
+            # allow players to ring in again
+            self.stoplight.color = (0, 1, 0)
+            self.timer = 5000
+            for player in self.players:
+                player.eligible = True
+            self.players[self.rung_in].eligible = False
+
         self.rung_in = None
 
     def update_control(self):
