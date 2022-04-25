@@ -23,7 +23,7 @@ def main():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((lan, 8080))
     print("Connected to server")
-
+    clock = pygame.time.Clock()
     while not quit_pressed:
         msg = s.recv(512)
         if len(msg) <= 0:
@@ -39,7 +39,11 @@ def main():
             if host.update():
                 # button was clicked, send back
                 s.send(str(host.correct).encode())
-                break
+                if host.correct:
+                    break
+                else:
+                    host.startup()
+                    msg = None
             # Display screen
             pygame.display.flip()
 
@@ -49,6 +53,7 @@ def main():
                     host.timer_expired = True
                 elif msg == 'rangin':
                     host.rang_in = True
+            clock.tick(40)
 
     s.close()
 

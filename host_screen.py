@@ -64,6 +64,7 @@ class Host():
             elif self.timer_expired:
                 # continue button if no one rings in
                 if self.clicked and self.buttons.continue_button.was_clicked():
+                    self.correct = True
                     return True
         self.clicked = False
         return False
