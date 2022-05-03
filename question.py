@@ -72,7 +72,7 @@ class Question(State):
         if TTS.is_busy():
             # question is still being read
             return GameState.QUESTION
-        if self.timer == 5000:
+        if not player_manager.green:
             # turn on light to let players know to ring in
             player_manager.green_light()
 
@@ -123,8 +123,9 @@ class Question(State):
                             player_manager.update(True,self.store['clue']['value'])
                             return GameState.BOARD
                         if resp == "False":
+                            self.timer = 5000
+                            player_manager.second_chance()
                             player_manager.update(False,self.store['clue']['value'])
-                            self.timer = 4999
                             return GameState.QUESTION
                     else:
                         self.show_answer = True

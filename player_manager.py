@@ -28,6 +28,7 @@ class PlayerManager():
         self.rung_in = None
         self.control = 0
         self.timer = 5000
+        self.green = False
 
     def green_light(self):
         """Turns on light to let players know they can ring in.
@@ -38,13 +39,14 @@ class PlayerManager():
         self.timer = 5000
         for player in self.players:
             player.eligible = True
+        self.green = True
 
     def reset(self):
         """Prevents all players from ringing in, resets lights.
 
         Called after question is answered or timer has experied."""
         self.stoplight.color = (0,0,0)
-        
+        self.green = False
         for player in self.players:
             player.eligible = False
             player.led.off()
@@ -88,15 +90,15 @@ class PlayerManager():
         # give control to player with correct answer
         if correct:
             self.control = self.rung_in
-        else:
-            # allow players to ring in again
-            self.stoplight.color = (0, 1, 0)
-            self.timer = 5000
-            for player in self.players:
-                player.eligible = True
-            self.players[self.rung_in].eligible = False
-
         self.rung_in = None
+
+    def second_chance(self):
+        """Allow players to ring in again after failed guess"""
+        self.stoplight.color = (0, 1, 0)
+        self.timer = 5000
+        for player in self.players:
+            player.eligible = True
+        self.players[self.rung_in].eligible = False
 
     def update_control(self):
         """Gives control to the player with the lowest score at start of second round."""
