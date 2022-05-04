@@ -93,20 +93,22 @@ class Question(State):
         else:
             if player_manager.rung_in is None:
                 # Decrement timer while waiting for players to ring in
-                if elapsed_time < 1000:
-                    self.timer -= elapsed_time
+                self.timer -= elapsed_time
                 if self.timer <= 0:
                     # no one rung in
-                    player_manager.reset()
-                    SoundEffects.play(1) # time's up
                     if host is not None:
-                        host.send("continue")
+                        if not host.wait:
+                            player_manager.reset()
+                            SoundEffects.play(1) # time's up
+                            host.send("continue")
+                            host.wait = True
                         # wait for host to continue
-                        resp = host.wait()
+                        resp = host.poll()
                         if resp:
-                            print(resp)
                             return GameState.BOARD
                     else:
+                        player_manager.reset()
+                        SoundEffects.play(1) # time's up
                         self.show_answer = True
             else:
                 # player rang in, wait for response
@@ -114,21 +116,28 @@ class Question(State):
                     if host is not None:
                         host.send("rangin")
                     self.rang_in = True
-                if player_manager.poll(elapsed_time):
-                    # player has answered question
-                    player_manager.reset()
-                    if host is not None:
-                        resp = host.wait()
-                        if resp == "True":
-                            player_manager.update(True,self.store['clue']['value'])
-                            return GameState.BOARD
-                        if resp == "False":
-                            self.timer = 5000
-                            player_manager.second_chance()
-                            player_manager.update(False,self.store['clue']['value'])
-                            return GameState.QUESTION
-                    else:
-                        self.show_answer = True
+
+                if host is not None:
+                    resp = host.poll()
+                    if resp == "True":
+                        player_manager.reset()
+                        player_manager.update(True,self.store['clue']['value'])
+                        return GameState.BOARD
+                    if resp == "False":
+                        self.timer = 5000
+                        player_manager.second_chance()
+                        player_manager.update(False,self.store['clue']['value'])
+                        return GameState.QUESTION
+
+                if player_manager.timer > 0:
+                    if player_manager.poll(elapsed_time):
+                        # out of time
+                        if host is None:
+                            player_manager.reset()
+                            self.show_answer = True
+                        else:
+                            SoundEffects.play(1) # time's up
+
         self.clicked = False # reset flag
         return GameState.QUESTION
 

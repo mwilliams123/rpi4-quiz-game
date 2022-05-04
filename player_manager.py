@@ -76,6 +76,7 @@ class PlayerManager():
         self.rung_in = player_id
         for player in self.players:
             player.eligible = False
+        self.stoplight.color = (0, 0, 0)
 
     def update(self, correct, value):
         """Adds clue's dollar amount to player's score if answer is correct,

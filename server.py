@@ -1,5 +1,5 @@
 import socket
-import time
+import select
 
 class Server():
     """Class for managing communication with Host when game is run in hosted mode.
@@ -15,16 +15,22 @@ class Server():
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server.bind((lan, port))
         self.server.listen(1)
-        client, addr = self.server.accept()
+        client, _ = self.server.accept()
         self.client = client
+        self.poller = select.poll()
+        self.poller.register(client, select.POLLIN)
+        self.wait = False
 
     def send(self, msg):
         self.client.send(msg.encode())
 
-    def wait(self):
-        print("waiting for response")
-        resp = self.client.recv(512).decode()
-        return resp
+    def poll(self):
+        events = self.poller.poll(10)
+        if len(events) > 0:
+            resp = self.client.recv(512).decode()
+            self.wait = False
+            return resp
+        return False
 
     def close(self):
         self.server.close()
