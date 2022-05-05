@@ -3,6 +3,7 @@ In hosted mode a human as the host can see answers and rule on responses.
 """
 import socket
 import select
+import time
 import pygame
 from host_screen import Host
 from util import Font
@@ -11,7 +12,7 @@ def main():
     # get LAN address
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.connect(("8.8.8.8", 80))
-    lan = s.getsockname()[0] #"192.168.1.31" 
+    lan = s.getsockname()[0] #"192.168.1.31"
     s.close()
     print(lan)
 
@@ -21,9 +22,16 @@ def main():
     host.startup()
     quit_pressed = False
     screen = pygame.display.set_mode((1300,700))
-    # connect to server
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect((lan, 8080))
+    while True:
+        try:
+            print("Trying to connect...")
+            # connect to server
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.connect((lan, 8080))
+            break
+        except ConnectionRefusedError:
+            time.sleep(1)
+
     poller = select.poll()
     poller.register(s, select.POLLIN)
     print("Connected to server")
