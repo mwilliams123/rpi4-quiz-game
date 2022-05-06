@@ -45,7 +45,7 @@ class Question(State):
         self.timer = 5000
         if host is not None:
             # send answer to host
-            host.send(store['clue']['question'])
+            host.send("answer: " + store['clue']['question'])
 
     def handle_event(self, event):
         """

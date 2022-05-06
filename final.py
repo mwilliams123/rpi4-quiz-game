@@ -63,7 +63,7 @@ class Final(InputState):
             elif not SoundEffects.is_busy():
                 # When final theme finishes, show the answer
                 if host is not None:
-                    host.send(clue['question'])
+                    host.send("Answer: " + clue['question'])
                 self.show_answer = True
                 self.players_left = player_manager.sort_players()
         if self.show_answer and self.winner is None:

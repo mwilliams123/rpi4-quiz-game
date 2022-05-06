@@ -41,12 +41,13 @@ def main():
         events = poller.poll(10)
         if len(events) > 0:
             msg = s.recv(512).decode()
+            print(msg)
             if msg == 'continue':
                 host.timer_expired = True
             elif msg == 'rangin':
                 host.rang_in = True
-            else:
-                text = msg
+            elif len(msg) > 8:
+                text = msg[8:]
         quit_pressed = host.handle_event()
         if quit_pressed:
             break
