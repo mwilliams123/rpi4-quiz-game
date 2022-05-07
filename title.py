@@ -18,6 +18,9 @@ class TitleScreen(State):
         super().__init__()
         self.name = GameState.TITLE
         self.play_button = Button("Play")
+        self.options = Button("Options")
+        self.back = Button("Back")
+        self.show_options = False
         self.clicked = False
 
     def handle_event(self, event):
@@ -43,8 +46,13 @@ class TitleScreen(State):
                 to return TITLE state.
         """
         # determine if start button clicked
-        if self.clicked and self.play_button.was_clicked():
-            return GameState.LOADING
+        if self.clicked:
+            if self.play_button.was_clicked():
+                return GameState.LOADING
+            if self.options.was_clicked():
+                self.show_options = True
+            if self.back.was_clicked():
+                self.show_options = False
 
         self.clicked = False # reset flag for next loop
         return GameState.TITLE
@@ -61,4 +69,8 @@ class TitleScreen(State):
 
         # draw start button in center of screen
         width, height = screen.get_size()
-        self.play_button.draw(screen, (width/2, height/2))
+        if self.show_options:
+            self.back.draw(screen, (20, 20))
+        else:
+            self.play_button.draw(screen, (width/2, height/2))
+            self.options.draw(screen, (width/2, height*3/4))
