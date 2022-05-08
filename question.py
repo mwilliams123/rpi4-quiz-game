@@ -93,7 +93,8 @@ class Question(State):
         else:
             if player_manager.rung_in is None:
                 # Decrement timer while waiting for players to ring in
-                self.timer -= elapsed_time
+                if elapsed_time < 1000:
+                    self.timer -= elapsed_time
                 if self.timer <= 0:
                     # no one rung in
                     player_manager.reset()
@@ -110,7 +111,8 @@ class Question(State):
             else:
                 # player rang in, wait for response
                 if not self.rang_in:
-                    host.send("rangin")
+                    if host is not None:
+                        host.send("rangin")
                     self.rang_in = True
                 if player_manager.poll(elapsed_time):
                     # player has answered question
