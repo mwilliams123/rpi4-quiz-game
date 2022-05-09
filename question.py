@@ -31,7 +31,7 @@ class Question(State):
         self.buttons = ButtonList(Button('Continue'), Button('Correct'), Button('Incorrect'))
         self.timer = 5000
 
-    def startup(self, store, host):
+    def startup(self, store):
         """Reads the question out loud and resets the timer.
 
         Args:
@@ -43,6 +43,7 @@ class Question(State):
         self.show_answer = False
         self.rang_in = False
         self.timer = 5000
+        host = self.store['host']
         if host is not None:
             # send answer to host
             host.send("answer: " + store['clue']['question'])
@@ -57,7 +58,7 @@ class Question(State):
         if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
             self.clicked = True
 
-    def update(self, player_manager, elapsed_time, host):
+    def update(self, player_manager, elapsed_time):
         """Checks if players have rung in or time has expired for the question to be answered.
         Waits for user to click a button to return to board.
 
@@ -69,6 +70,7 @@ class Question(State):
             (GameState): BOARD if question has been answered or continue button is clicked after
                 no one rung in. Continues to return QUESTION otherwise.
         """
+        host = self.store['host']
         if TTS.is_busy():
             # question is still being read
             return GameState.QUESTION

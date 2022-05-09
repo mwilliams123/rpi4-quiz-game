@@ -10,7 +10,6 @@ import pygame
 from constants import GameState
 from score import display_score
 from player_manager import PlayerManager
-from server import Server
 
 class Game():
     """
@@ -29,7 +28,7 @@ class Game():
         player_manager (PlayerManager): A reference to the PlayerManager object
             that keeps track of players
     """
-    def __init__(self, screen, hosted, states, start_state=GameState.TITLE):
+    def __init__(self, screen, states, start_state=GameState.TITLE):
         """Initializes Game Object
 
         Args:
@@ -45,10 +44,6 @@ class Game():
         self.states = states
         self.state = states[start_state]
         self.player_manager = PlayerManager()
-        self.host = None
-        if hosted:
-            self.host = Server()
-            print("Host server started...")
 
     def handle_events(self):
         """Handles events like mouse clicks, keyboard presses.
@@ -69,7 +64,7 @@ class Game():
         """Changes state to the next game state and passes along persistent data."""
         store = self.state.store
         self.state = self.states[next_state]
-        self.state.startup(store, self.host)
+        self.state.startup(store)
 
     def update(self, elapsed_time):
         """Handles game logic and determines what the next game state should be
@@ -77,7 +72,7 @@ class Game():
         Args:
             elapsed_time (int): Milliseconds passed since the last time update() was called.
         """
-        next_state = self.state.update(self.player_manager, elapsed_time, self.host)
+        next_state = self.state.update(self.player_manager, elapsed_time)
         if next_state != self.state.name:
             self.change_state(next_state)
 
@@ -110,6 +105,6 @@ class Game():
             # Display screen
             pygame.display.flip()
 
-        if self.host is not None:
-            self.host.close()
+        if 'host' in self.state.store and self.state.store['host'] is not None:
+            self.state.store['host'].close()
             print("Host server closed.")

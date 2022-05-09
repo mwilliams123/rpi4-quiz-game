@@ -17,12 +17,11 @@ from util import Font, SoundEffects
 
 def main():
     """Initializes pygame display, loads resources, & launches game."""
-    hosted = True # whether game has a human host
     pygame.init()
     SoundEffects.load_sounds()
     Font.load_fonts()
     screen = pygame.display.set_mode((1300,700))
-    game = Game(screen, hosted, {
+    game = Game(screen, {
         GameState.TITLE: TitleScreen(),
         GameState.LOADING: LoadingScreen(),
         GameState.INTRO: IntroScreen(),

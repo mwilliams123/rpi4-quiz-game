@@ -12,17 +12,29 @@ class Server():
         s.close()
 
         # start server
+        print("Starting host server...")
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server.bind((lan, port))
         self.server.listen(1)
-        client, _ = self.server.accept()
-        self.client = client
+        self.client_poller = select.poll()
+        self.client_poller.register(self.server, select.POLLIN)
+        self.client = None
         self.poller = select.poll()
-        self.poller.register(client, select.POLLIN)
         self.wait = False
 
     def send(self, msg):
         self.client.send(msg.encode())
+
+    def poll_for_connection(self):
+        events = self.client_poller.poll(10)
+        if len(events) > 0:
+            client, _ = self.server.accept()
+            print("Connected to host")
+            self.client = client
+            self.poller.register(client, select.POLLIN)
+
+    def is_connected(self):
+        return self.client is not None
 
     def poll(self):
         events = self.poller.poll(10)

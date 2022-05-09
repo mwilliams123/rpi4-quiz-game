@@ -30,15 +30,8 @@ class Final(InputState):
         self.play_sound = False
         self.winner = None
         self.players_left = []
-        self.hosted = False
 
-    def startup(self, store, host):
-        self.store = store
-        if host is not None:
-            # send answer to host
-            self.hosted = True
-
-    def update(self, player_manager, elapsed_time, host):
+    def update(self, player_manager, elapsed_time):
         """Checks if players have entered wagers, reads question, and plays final theme.
 
         Args:
@@ -48,6 +41,7 @@ class Final(InputState):
         Returns:
             GameState: FINAL game state
         """
+        host = self.store['host']
         clue = self.store['data']['fj']
         if self.wait_for_wagers:
             # Wait until continue is clicked, then present question
@@ -112,7 +106,7 @@ class Final(InputState):
                     draw_text(screen, text, Font.number, (100, 100, width-100, height-100))
                 else:
                     # draw answer
-                    if not self.hosted:
+                    if self.store['host'] is None:
                         text = clue['question']
                         draw_text(screen, text.upper(), Font.clue, (100, 0, width-100, height/3))
                     player = self.players_left[0].number

@@ -134,6 +134,10 @@ class Button():
         self.rect = self.text.get_rect(center=pos)
         screen.blit(self.text, self.rect)
 
+    def set_text(self, text):
+        self.text = Font.button.render(text, True, Colors.WHITE)
+
+
 def draw_text(screen, text, font, rect):
     """Draws multiline text centered horizontally and vertically within a rectangle.
 

@@ -20,7 +20,7 @@ class IntroScreen(State):
         self.categories = []
         self.index = 0
 
-    def startup(self, store, host):
+    def startup(self, store):
         self.store = store
         self.index = 0
         # load categories for this round
@@ -29,7 +29,7 @@ class IntroScreen(State):
         # Use Text-to-Speech
         TTS.play_speech("The categories are")
 
-    def update(self, player_manager, elapsed_time, host):
+    def update(self, player_manager, elapsed_time):
         """Checks if last speech has finished, and if so, introduces next category.
 
         Args:

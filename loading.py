@@ -6,6 +6,7 @@ import requests
 from constants import GameState, Colors
 from util import Font
 from state import State
+from server import Server
 
 class LoadingScreen(State):
     """Game State that draws loading screen and loads questions.
@@ -25,7 +26,7 @@ class LoadingScreen(State):
         self.data = {}
         self.thread = None
 
-    def startup(self, store, host):
+    def startup(self, store):
         """
         Starts a new thread to fetch questions.
 
@@ -35,6 +36,10 @@ class LoadingScreen(State):
         self.store = store
         self.thread = threading.Thread(target=self.fetch)
         self.thread.start()
+        if self.store['hosted']:
+            self.store['host'] = Server()
+        else:
+            self.store['host'] = None
 
     def fetch(self):
         """Fetches questions from the API and formats them into rounds."""
@@ -45,7 +50,7 @@ class LoadingScreen(State):
         # final jeopardy
         self.data['fj'] = data_json['fj']
 
-    def update(self, player_manager, elapsed_time, host):
+    def update(self, player_manager, elapsed_time):
         """Checks if data has finished loading from the API.
 
         Args:
@@ -56,11 +61,17 @@ class LoadingScreen(State):
             GameState: Returns INTRO game state when questions have finished loading,
                 otherwise returns LOADING state.
         """
+        host = self.store['host']
+        # wait for host connection
+        if host is not None and not host.is_connected():
+            host.poll_for_connection()
+
         # check if loading thread has exited
         if not self.thread.is_alive():
             self.store['data'] = self.data
             self.store['round'] = 0
-            return GameState.INTRO
+            if host is None or host.is_connected():
+                return GameState.INTRO
         return GameState.LOADING
 
     def draw(self, screen):

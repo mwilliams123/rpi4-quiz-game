@@ -3,7 +3,7 @@ Display Title screen.
 """
 import pygame
 from constants import GameState, Colors
-from util import Button
+from util import Button, Font
 from state import State
 
 class TitleScreen(State):
@@ -20,8 +20,10 @@ class TitleScreen(State):
         self.play_button = Button("Play")
         self.options = Button("Options")
         self.back = Button("Back")
+        self.hosted_toggle = Button("OFF")
         self.show_options = False
         self.clicked = False
+        self.store['hosted'] = False
 
     def handle_event(self, event):
         """
@@ -33,7 +35,7 @@ class TitleScreen(State):
         if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
             self.clicked = True
 
-    def update(self, player_manager, elapsed_time, host):
+    def update(self, player_manager, elapsed_time):
         """
         Checks if start button has been clicked.
 
@@ -53,6 +55,9 @@ class TitleScreen(State):
                 self.show_options = True
             if self.back.was_clicked():
                 self.show_options = False
+            if self.hosted_toggle.was_clicked():
+                self.store['hosted'] = not self.store['hosted']
+                self.hosted_toggle.set_text('ON' if self.store['hosted'] else 'OFF')
 
         self.clicked = False # reset flag for next loop
         return GameState.TITLE
@@ -70,7 +75,11 @@ class TitleScreen(State):
         # draw start button in center of screen
         width, height = screen.get_size()
         if self.show_options:
-            self.back.draw(screen, (20, 20))
+            self.back.draw(screen, (40, 20))
+            text = Font.button.render("Hosted Mode", True, Colors.WHITE)
+            text_rect = text.get_rect(center=(width/4, height/2))
+            screen.blit(text, text_rect)
+            self.hosted_toggle.draw(screen, (width*3/4, height/2))
         else:
             self.play_button.draw(screen, (width/2, height/2))
             self.options.draw(screen, (width/2, height*3/4))

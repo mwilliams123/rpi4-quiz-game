@@ -37,7 +37,7 @@ class Board(State):
         if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
             self.clicked = True
 
-    def update(self, player_manager, elapsed_time, host):
+    def update(self, player_manager, elapsed_time):
         """Checks if a clue was clicked on. Moves to the next round if no clues left.
 
         Args:
