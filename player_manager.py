@@ -117,6 +117,10 @@ class PlayerManager():
                 lowest = player.score
                 self.control = player.number
 
+    def show_control(self):
+        """Turns on light of player who has control."""
+        self.players[self.control].led.on()
+
     def get_winner(self):
         "Returns id number of player with highest score."
         highest = 0

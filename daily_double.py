@@ -23,7 +23,7 @@ class DailyDouble(InputState):
         self.wager = None
         self.timer = 6000
 
-    def startup(self, store):
+    def startup(self, store, player_manager):
         SoundEffects.play(2) # daily double sound
         self.store = store
         self.clicked = False

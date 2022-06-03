@@ -27,6 +27,17 @@ class Board(State):
         self.clicked = False
         self.grid = ([], [])
 
+    def startup(self, store, player_manager):
+        """
+        Turns on light of player who has control
+
+        Args:
+            store (dict of str: Any): Dictionary of persistent data passed from state to state
+        """
+        self.store = store
+        player_manager.reset()
+        player_manager.show_control()
+
     def handle_event(self, event):
         """
         Sets flag when left mouse is clicked.

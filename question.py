@@ -31,7 +31,7 @@ class Question(State):
         self.buttons = ButtonList(Button('Continue'), Button('Correct'), Button('Incorrect'))
         self.timer = 5000
 
-    def startup(self, store):
+    def startup(self, store, player_manager):
         """Reads the question out loud and resets the timer.
 
         Args:

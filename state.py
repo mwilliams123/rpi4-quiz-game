@@ -23,7 +23,7 @@ class State():
     def __init__(self):
         self.store = {}
 
-    def startup(self, store):
+    def startup(self, store, player_manager):
         """
         Executes once immediately after a state is transitioned into.
 

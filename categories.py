@@ -20,7 +20,7 @@ class IntroScreen(State):
         self.categories = []
         self.index = 0
 
-    def startup(self, store):
+    def startup(self, store, player_manager):
         self.store = store
         self.index = 0
         # load categories for this round

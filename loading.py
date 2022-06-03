@@ -26,7 +26,7 @@ class LoadingScreen(State):
         self.data = {}
         self.thread = None
 
-    def startup(self, store):
+    def startup(self, store, player_manager):
         """
         Starts a new thread to fetch questions.
 

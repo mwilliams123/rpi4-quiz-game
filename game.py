@@ -64,7 +64,7 @@ class Game():
         """Changes state to the next game state and passes along persistent data."""
         store = self.state.store
         self.state = self.states[next_state]
-        self.state.startup(store)
+        self.state.startup(store, self.player_manager)
 
     def update(self, elapsed_time):
         """Handles game logic and determines what the next game state should be
