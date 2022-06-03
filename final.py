@@ -3,7 +3,7 @@ Implement final jeopardy
 """
 
 from constants import Colors, GameState
-from util import SoundEffects, draw_text, TTS, Font
+from util import SoundEffects, display_text, TTS, Font
 from state import InputState
 
 class Final(InputState):
@@ -103,15 +103,15 @@ class Final(InputState):
             if self.show_answer:
                 if self.winner is not None:
                     text = "Player " + str(self.winner + 1) + " wins!"
-                    draw_text(screen, text, Font.number, (100, 100, width-100, height-100))
+                    display_text(screen, text, Font.number, (100, 100, width-100, height-100))
                 else:
                     # draw answer
                     if self.store['host'] is None:
                         text = clue['question']
-                        draw_text(screen, text.upper(), Font.clue, (100, 0, width-100, height/3))
+                        display_text(screen, text.upper(), Font.clue, (100, 0, width-100, height/3))
                     player = self.players_left[0].number
                     text = "Player " + str(player + 1) + " wager:"
-                    draw_text(screen, text, Font.number, (100, height/3, width-100, height/2))
+                    display_text(screen, text, Font.number, (100, height/3, width-100, height/2))
                     # draw wagered amount
                     text = Font.number.render('$' + self.input, True, Colors.WHITE)
                     rect = text.get_rect(center=(width/2, height*3/5))
@@ -121,4 +121,4 @@ class Final(InputState):
             else:
                 # draw clue
                 text = clue['answer']
-                draw_text(screen, text.upper(), Font.clue, (100, 100, width-100, height-100))
+                display_text(screen, text.upper(), Font.clue, (100, 100, width-100, height-100))

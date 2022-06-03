@@ -4,7 +4,7 @@ Show answer on screen and let host indicate if answered correctly
 from collections import namedtuple
 import pygame
 from constants import Colors
-from util import draw_text, Button,  Font
+from util import display_text, Button,  Font
 
 class Host():
     """Game state that handles presenting clues, waiting for players to ring in,
@@ -82,7 +82,7 @@ class Host():
 
         width, height = screen.get_size()
         # draw answer
-        draw_text(screen, text.upper(), Font.clue, (100, 100, width-100, height-100))
+        display_text(screen, text.upper(), Font.clue, (100, 100, width-100, height-100))
         if self.rang_in:
             # draw correct/incorrect buttons
             self.buttons.correct_button.draw(screen, (width*1/4, height*3/4))

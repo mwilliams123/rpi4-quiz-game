@@ -2,7 +2,7 @@
 Implement Daily Double
 """
 from constants import GameState, Colors
-from util import TTS, SoundEffects, draw_text, Font
+from util import TTS, SoundEffects, display_text, Font
 from state import InputState
 
 class DailyDouble(InputState):
@@ -88,10 +88,10 @@ class DailyDouble(InputState):
         elif self.timer <= 0:
             # draw answer
             text = self.store['clue']['question']
-            draw_text(screen, text.upper(), Font.clue, (100, 100, width-100, height-100))
+            display_text(screen, text.upper(), Font.clue, (100, 100, width-100, height-100))
             # draw correct/incorrect buttons
             self.draw_buttons(screen)
         else:
             # draw clue
             text = self.store['clue']['answer']
-            draw_text(screen, text.upper(), Font.clue, (100, 100, width-100, height-100))
+            display_text(screen, text.upper(), Font.clue, (100, 100, width-100, height-100))

@@ -137,8 +137,21 @@ class Button():
     def set_text(self, text):
         self.text = Font.button.render(text, True, Colors.WHITE)
 
+def display_text(screen, text, font, rect):
+    """Displays text with shadow.
 
-def draw_text(screen, text, font, rect):
+    Args:
+        screen (Surface): Pygame surface where game will be drawn
+        text (str): The words to be drawn
+        font (Font): Pygame Font to render the text in
+        rect (int, int, int, int): Bounds (left, top, right, bottom) of the rectangle to draw
+            the text within. Bounds are pixel values relative to screen.
+    """
+    offset = 2
+    draw_text(screen, text, font, (rect[0]+offset, rect[1]+offset, rect[2]+offset, rect[3]+offset), Colors.BLACK)
+    draw_text(screen, text, font, rect, Colors.WHITE)
+
+def draw_text(screen, text, font, rect, color):
     """Draws multiline text centered horizontally and vertically within a rectangle.
 
     Args:
@@ -166,7 +179,7 @@ def draw_text(screen, text, font, rect):
             line_width += word_len
             i += 1
         # render line to a rectangular surface
-        rects.append(font.render(line, True, Colors.WHITE))
+        rects.append(font.render(line, True, color))
         height += line_height
 
     # draw text rectangles

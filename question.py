@@ -4,7 +4,7 @@ Show question on screen and get player response
 from collections import namedtuple
 import pygame
 from constants import Colors, GameState
-from util import SoundEffects, draw_text, Button, TTS, Font
+from util import SoundEffects, display_text, Button, TTS, Font
 from state import State
 
 class Question(State):
@@ -157,7 +157,7 @@ class Question(State):
         if self.show_answer:
             # draw answer
             text = self.store['clue']['question']
-            draw_text(screen, text.upper(), Font.clue, (100, 100, width-100, height-100))
+            display_text(screen, text.upper(), Font.clue, (100, 100, width-100, height-100))
             if self.rang_in:
                 # draw correct/incorrect buttons
                 self.buttons.correct_button.draw(screen, (width*1/4, height*3/4))
@@ -168,4 +168,4 @@ class Question(State):
         else:
             # draw question
             text = self.store['clue']['answer']
-            draw_text(screen, text.upper(), Font.clue, (100, 100, width-100, height-100))
+            display_text(screen, text.upper(), Font.clue, (100, 100, width-100, height-100))

@@ -3,7 +3,7 @@ Draw game board & clue values.
 """
 import pygame
 from constants import Colors, GameState
-from util import draw_text, Font
+from util import display_text, Font
 from state import State
 
 class Board(State):
@@ -122,7 +122,7 @@ class Board(State):
         # draw categories
         x_pos = 0
         for category in self.store['data'][round_]:
-            draw_text(screen, category, Font.category, (x_pos + 5, 0, x_pos + width//6 - 5,
+            display_text(screen, category, Font.category, (x_pos + 5, 0, x_pos + width//6 - 5,
                       height//6))
             x_pos += width//6 + 1
 
@@ -151,5 +151,12 @@ def draw_number(screen, num, rect):
             corner of the rectangle. Width and height are the dimensions.
     """
     text = Font.number.render('$' + str(num), True, Colors.GOLD)
-    text_rect = text.get_rect(center=(rect[0] + rect[2]/2, rect[1] + rect[3]/2))
+    text_shadow = Font.number.render('$' + str(num), True, Colors.BLACK)
+    center_rect = (rect[0] + rect[2]/2, rect[1] + rect[3]/2)
+    offset_rect = (center_rect[0]+2, center_rect[1]+2)
+    # draw text shadow
+    text_rect = text.get_rect(center=offset_rect)
+    screen.blit(text_shadow,text_rect)
+    # draw text
+    text_rect = text.get_rect(center=center_rect)
     screen.blit(text,text_rect)
