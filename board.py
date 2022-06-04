@@ -85,7 +85,8 @@ class Board(State):
                 if pos[1] < horizontal_lines[j]:
                     break
                 j += 1
-
+            if j < 2:
+                return GameState.BOARD
             # Find which clue was clicked based on grid row, col
             category = list(self.store['data'][round_].keys())[i-1]
             clues = self.store['data'][round_][category]
@@ -115,7 +116,8 @@ class Board(State):
 
         # draw 6x6 grid on screen
         width, height = screen.get_size()
-        vertical_lines = range(0,width, width//6+1) # vertical lines
+        step = width//6+1
+        vertical_lines = range(0, width + step, step) # vertical lines
         horizontal_lines = range(0,height, height//6+1) # horizonal lines
         for i in vertical_lines:
             pygame.draw.line(screen, Colors.BLACK, (i, 0), (i, height), 5)
@@ -127,7 +129,7 @@ class Board(State):
         round_ = self.store['round']
         for i, x_pos in enumerate(vertical_lines):
             for j, y_pos in enumerate(horizontal_lines):
-                if j != 0 and list(self.store['data'][round_].values())[i][j-1] is not None:
+                if j > 0 and i < 6 and list(self.store['data'][round_].values())[i][j-1] is not None:
                     draw_number(screen, j*200*(round_+1), (x_pos,y_pos, width//6, height//6))
 
         # draw categories

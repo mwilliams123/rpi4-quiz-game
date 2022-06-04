@@ -8,7 +8,8 @@ Usage Example:
 """
 import pygame
 from constants import GameState
-from score import display_score
+from player import Player
+from score import Score
 from player_manager import PlayerManager
 
 class Game():
@@ -39,11 +40,11 @@ class Game():
         """
         self.screen = screen
         self.game_board = pygame.Surface((1000, 700))
-        self.score_board = pygame.Surface((300, 700))
         self.clock = pygame.time.Clock()
         self.states = states
         self.state = states[start_state]
         self.player_manager = PlayerManager()
+        self.score_board = Score(len(self.player_manager.players))
 
     def handle_events(self):
         """Handles events like mouse clicks, keyboard presses.
@@ -56,6 +57,11 @@ class Game():
                 if event.key == pygame.K_ESCAPE:
                     # Exit game if escape key is pressed
                     return True
+            if self.state.name == GameState.BOARD:
+                if event.type == pygame.MOUSEBUTTONUP and event.button == 1 and pygame.mouse.get_pos()[0] > 1000:
+                    self.score_board.edit_score(self.player_manager)
+                    return False
+                self.score_board.update_score(event, self.player_manager)
             # pass along event to be handled by current state
             self.state.handle_event(event)
         return False
@@ -65,6 +71,7 @@ class Game():
         store = self.state.store
         self.state = self.states[next_state]
         self.state.startup(store, self.player_manager)
+        self.score_board.reset(self.player_manager)
 
     def update(self, elapsed_time):
         """Handles game logic and determines what the next game state should be
@@ -82,8 +89,8 @@ class Game():
             self.state.draw(self.screen)
         else:
             # draw score board
-            display_score(self.score_board, self.player_manager)
-            self.screen.blit(self.score_board, (1000,0))
+            self.score_board.display_score(self.player_manager)
+            self.screen.blit(self.score_board.screen, (1000,0))
             # draw the game board
             self.state.draw(self.game_board)
             self.screen.blit(self.game_board, (0,0))
