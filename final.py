@@ -3,7 +3,7 @@ Implement final jeopardy
 """
 
 from constants import Colors, GameState
-from util import SoundEffects, display_text, TTS, Font
+from util import Button, SoundEffects, display_text, TTS, Font
 from state import InputState
 
 class Final(InputState):
@@ -30,6 +30,7 @@ class Final(InputState):
         self.play_sound = False
         self.winner = None
         self.players_left = []
+        self.return_button = Button('Continue')
 
     def update(self, player_manager, elapsed_time):
         """Checks if players have entered wagers, reads question, and plays final theme.
@@ -67,6 +68,9 @@ class Final(InputState):
             if len(self.players_left) <= 0:
                 # show winner
                 self.winner = player_manager.get_winner()
+        if self.winner is not None:
+            if self.clicked and self.return_button.was_clicked():
+                return GameState.HALL
         self.clicked = False
         return GameState.FINAL
 
@@ -104,6 +108,7 @@ class Final(InputState):
                 if self.winner is not None:
                     text = "Player " + str(self.winner + 1) + " wins!"
                     display_text(screen, text, Font.number, (100, 100, width-100, height-100))
+                    self.return_button.draw(screen, (width/2, height*3/4))
                 else:
                     # draw answer
                     if self.store['host'] is None:

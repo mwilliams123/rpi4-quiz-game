@@ -10,6 +10,7 @@ from daily_double import DailyDouble
 from final import Final
 from game import Game
 from constants import GameState
+from hall_of_fame import Hall
 from loading import LoadingScreen
 from question import Question
 from title import TitleScreen
@@ -29,6 +30,7 @@ def main():
         GameState.QUESTION: Question(),
         GameState.DAILY_DOUBLE: DailyDouble(),
         GameState.FINAL: Final(),
+        GameState.HALL: Hall(),
     })
     game.run()
     pygame.quit()

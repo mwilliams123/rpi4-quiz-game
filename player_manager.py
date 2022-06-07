@@ -30,6 +30,10 @@ class PlayerManager():
         self.timer = 5000
         self.green = False
 
+    def zero_scores(self):
+        for player in self.players:
+            player.score = 0
+
     def green_light(self):
         """Turns on light to let players know they can ring in.
 

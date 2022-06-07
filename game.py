@@ -8,7 +8,6 @@ Usage Example:
 """
 import pygame
 from constants import GameState
-from player import Player
 from score import Score
 from player_manager import PlayerManager
 
@@ -85,7 +84,7 @@ class Game():
 
     def draw(self):
         """Draws the current frame to the screen."""
-        if self.state.name in (GameState.TITLE, GameState.LOADING, GameState.INTRO):
+        if self.state.name in (GameState.TITLE, GameState.LOADING, GameState.INTRO, GameState.HALL):
             self.state.draw(self.screen)
         else:
             # draw score board

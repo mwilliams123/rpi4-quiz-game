@@ -24,6 +24,7 @@ class GameState(Enum):
     DAILY_DOUBLE = 5
     INTRO = 6
     FINAL = 7
+    HALL = 8
 
 @dataclass
 class Colors:
