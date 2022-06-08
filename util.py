@@ -21,11 +21,13 @@ class Font():
     CLUE = 1
     NUMBER = 2
     CATEGORY = 3
+    BIG = 4
     _fonts = {}
     @classmethod
     def load_fonts(cls):
         """Loads fonts to be used in game."""
         cls._fonts[cls.DEFAULT] = pygame.font.SysFont("arial", 40)
+        cls._fonts[cls.BIG] = pygame.font.SysFont("arial", 80)
         cls._fonts[cls.CLUE]= pygame.font.Font('fonts/Caudex-Bold.ttf', 60)
         cls._fonts[cls.NUMBER] = pygame.font.Font('fonts/Anton-Regular.ttf', 60)
         cls._fonts[cls.CATEGORY] = pygame.font.Font('fonts/Anton-Regular.ttf', 24)
@@ -111,13 +113,15 @@ class Button():
         text (Surface): Pygame surface with button's text rendered on it
         rect: (Rectangle): Rectangle that the button is contained within
     """
-    def __init__(self, text):
+    def __init__(self, text, font=None):
         """Initializes button Object
 
         Args:
             text (str): Text that goes on button
         """
-        self.text = Font.button.render(text, True, Colors.WHITE)
+        if font is None:
+            font = Font.button
+        self.text = font.render(text, True, Colors.WHITE)
         self.rect = None
 
     def was_clicked(self):

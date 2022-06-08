@@ -17,13 +17,28 @@ class TitleScreen(State):
     def __init__(self):
         super().__init__()
         self.name = GameState.TITLE
-        self.play_button = Button("Play")
+        self.play_button = Button("Play", Font.get_font(Font.BIG))
+        self.hall_button = Button("Hall of Fame")
         self.options = Button("Options")
         self.back = Button("Back")
         self.hosted_toggle = Button("OFF")
         self.show_options = False
         self.clicked = False
+        self.initialize_store()
+
+    def startup(self, store, player_manager):
+        """
+        Executes once immediately after a state is transitioned into.
+
+        Args:
+            store (dict of str: Any): Dictionary of persistent data passed from state to state
+        """
+        self.store = {}
+        self.initialize_store()
+
+    def initialize_store(self):
         self.store['hosted'] = False
+        self.store['n_players'] = 3
 
     def handle_event(self, event):
         """
@@ -51,6 +66,8 @@ class TitleScreen(State):
         if self.clicked:
             if self.play_button.was_clicked():
                 return GameState.LOADING
+            if self.hall_button.was_clicked():
+                return GameState.HALL
             if self.options.was_clicked():
                 self.show_options = True
             if self.back.was_clicked():
@@ -81,5 +98,6 @@ class TitleScreen(State):
             screen.blit(text, text_rect)
             self.hosted_toggle.draw(screen, (width*3/4, height/2))
         else:
-            self.play_button.draw(screen, (width/2, height/2))
-            self.options.draw(screen, (width/2, height*3/4))
+            self.play_button.draw(screen, (width/2, height/3))
+            self.hall_button.draw(screen, (width/2, height*3/4))
+            self.options.draw(screen, (width/2, height*7/12))
