@@ -69,11 +69,65 @@ class LoadingScreen(State):
 
         # check if loading thread has exited
         if not self.thread.is_alive():
-            self.store['data'] = self.data
+            if self.check_data():
+                self.store['data'] = self.data
+            else:
+                # fetch again
+                self.thread = threading.Thread(target=self.fetch)
+                self.thread.start()
+                return GameState.LOADING
             self.store['round'] = 0
             if host is None or host.is_connected():
-                return GameState.INTRO
+                return GameState.BOARD
         return GameState.LOADING
+
+    def check_data(self):
+        """Returns true if data is valid
+        """
+        if 'fj' not in self.data or not self.check_clue(self.data['fj']):
+            print("Bad final jeopardy: " + str(self.data['fj']))
+            return False
+        return self.check_round(0) and self.check_round(1)
+
+    def check_round(self, round_):
+        if round_ not in self.data or len(self.data[round_].keys()) < 6:
+            print("Not enough categories for round " + str(round_))
+            return False
+        for cat in self.data[round_]:
+            if not self.check_category(self.data[round_][cat], round_):
+                return False
+        return True
+
+    def check_category(self, category, round_):
+        values = set([x*(round_+1) for x in [200,400,600,800,1000]])
+        daily_double = 0
+        if len(category) < 5:
+            print("Not enought clues: " + str(category))
+            return False
+        for clue in category:
+            if not self.check_clue(clue):
+                return False
+            if clue['daily_double'] == 1:
+                daily_double += 1
+            else:
+                if clue['value'] not in values:
+                    print('Clue has bad value: ' + str(clue))
+                    return False
+                values.discard(clue['value'])
+        if len(values) == 0:
+            return True
+        if len(values) == 1 and daily_double == 1:
+            return True
+        print("Clues have wrong values: " + str(category))
+        return False
+
+    def check_clue(self, clue):
+        try:
+            return len(clue['category']) > 0 and len(clue['answer'])>0 and len(clue['question'])>0
+        except KeyError:
+            print('Bad clue: ' + str(clue))
+            return False
+
 
     def draw(self, screen):
         """
