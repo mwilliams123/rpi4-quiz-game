@@ -22,6 +22,8 @@ class Font():
     NUMBER = 2
     CATEGORY = 3
     BIG = 4
+    CLUE_SMALL = 5
+    CLUE_SMALLEST = 6
     _fonts = {}
     @classmethod
     def load_fonts(cls):
@@ -29,6 +31,8 @@ class Font():
         cls._fonts[cls.DEFAULT] = pygame.font.SysFont("arial", 40)
         cls._fonts[cls.BIG] = pygame.font.SysFont("arial", 80)
         cls._fonts[cls.CLUE]= pygame.font.Font('fonts/Caudex-Bold.ttf', 60)
+        cls._fonts[cls.CLUE_SMALL]= pygame.font.Font('fonts/Caudex-Bold.ttf', 50)
+        cls._fonts[cls.CLUE_SMALLEST]= pygame.font.Font('fonts/Caudex-Bold.ttf', 40)
         cls._fonts[cls.NUMBER] = pygame.font.Font('fonts/Anton-Regular.ttf', 60)
         cls._fonts[cls.CATEGORY] = pygame.font.Font('fonts/Anton-Regular.ttf', 24)
 
@@ -47,6 +51,13 @@ class Font():
             return cls._fonts[font]
 
         raise FileNotFoundError('That font has not been loaded. Please try load_fonts() first.')
+
+    @classmethod
+    def get_smaller(cls, font):
+        if font == cls.get_font(cls.CLUE):
+            return cls.get_font(cls.CLUE_SMALL)
+        if font == cls.get_font(cls.CLUE_SMALL):
+            return cls.get_font(cls.CLUE_SMALLEST)
 
     @classmethod
     @property
@@ -185,6 +196,11 @@ def draw_text(screen, text, font, rect, color):
         # render line to a rectangular surface
         rects.append(font.render(line, True, color))
         height += line_height
+
+    if height > screen.get_size()[1] and Font.get_smaller(font):
+        # try again with a smaller font
+        draw_text(screen, text, Font.get_smaller(font), rect, color)
+        return
 
     # draw text rectangles
     y_pos = (rect[1] + rect[3])/2 - height/2 + line_height/2 # center vertically
