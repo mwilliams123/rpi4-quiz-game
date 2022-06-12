@@ -22,6 +22,7 @@ class DailyDouble(InputState):
         self.name = GameState.DAILY_DOUBLE
         self.wager = None
         self.timer = 6000
+        self.show_answer = False
 
     def startup(self, store, player_manager):
         SoundEffects.play(2) # daily double sound
@@ -29,6 +30,7 @@ class DailyDouble(InputState):
         self.clicked = False
         self.wager = None
         self.timer = 6000
+        self.show_answer = False
 
     def update(self, player_manager, elapsed_time):
         """Checks if the user has made a wager, reads the question, and counts down the time a
@@ -41,6 +43,7 @@ class DailyDouble(InputState):
         Returns:
             GameState: BOARD after question is answered, otherwise continues to return DAILY_DOUBLE
         """
+        host = self.store['host']
         if TTS.is_busy():
             # question is still being read
             return GameState.DAILY_DOUBLE
@@ -49,9 +52,13 @@ class DailyDouble(InputState):
             # Get wagered amount from user input when continue button is clicked
             if self.clicked and self.buttons.continue_button.was_clicked() and self.input.isdigit():
                 self.wager = int(self.input)
+                if host is not None:
+                    # send answer to host
+                    host.send("answer: " + self.store['clue']['question'])
+                    host.send("rangin")
                 TTS.play_speech(self.store['clue']['answer']) # read question
         else:
-            if self.timer <= 0:
+            if self.show_answer:
                 # Determine if player answered correctly based on which button was clicked
                 if self.clicked:
                     player = player_manager.players[player_manager.control]
@@ -59,9 +66,18 @@ class DailyDouble(InputState):
                         return GameState.BOARD
             else:
                 # Count down time left to answer
-                self.timer -= elapsed_time
-                if self.timer <= 0:
-                    SoundEffects.play(1) # time's up
+                if self.timer > 0:
+                    self.timer -= elapsed_time
+                    if self.timer <= 0:
+                        SoundEffects.play(1) # time's up
+                        if host is None:
+                            self.show_answer = True
+                if host is not None:
+                    resp = host.poll()
+                    if resp == "True" or resp == "False":
+                        correct = resp == "True"
+                        player = player_manager.players[player_manager.control]
+                        player.answer_question(correct, self.wager)
         self.clicked = False # reset flag
         return GameState.DAILY_DOUBLE
 
@@ -85,7 +101,7 @@ class DailyDouble(InputState):
             text = Font.number.render('$' + self.input, True, Colors.WHITE)
             rect = text.get_rect(center=(width/2, height/2))
             screen.blit(text,rect)
-        elif self.timer <= 0:
+        elif self.show_answer:
             # draw answer
             text = self.store['clue']['question']
             display_text(screen, text.upper(), Font.clue, (100, 100, width-100, height-100))
