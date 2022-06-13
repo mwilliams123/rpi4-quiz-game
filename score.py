@@ -43,7 +43,11 @@ class Score:
     def reset(self, player_manager):
         """Call when change states."""
         if self.editing is not None:
-            player_manager.players[self.editing].score = int(self.edit_text)
+            try:
+                wager = int(self.edit_text)
+                player_manager.players[self.editing].score = wager
+            except ValueError:
+                print("Invalid input. Must be a number")
             self.editing = None
 
     def display_score(self, player_manager):

@@ -105,7 +105,10 @@ class InputState(State):
             boolean: True if a button was clicked, false otherwise.
         """
         if self.clicked:
-            wager = int(self.input)
+            try:
+                wager = int(self.input)
+            except ValueError:
+                return False
             if self.buttons.correct_button.was_clicked():
                 player.answer_question(True, wager)
                 self.input = ''
