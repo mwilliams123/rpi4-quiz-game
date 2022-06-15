@@ -23,6 +23,7 @@ class Hall(State):
             file.close()
         except Exception as error:
             print(error)
+            self.scores = []
         if 'round' in store and store['round'] >= 2:
             self.new_entry = True
         self.place = None

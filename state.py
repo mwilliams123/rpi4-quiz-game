@@ -78,6 +78,7 @@ class InputState(State):
         self.input = ''
         ButtonList = namedtuple('ButtonsList',['continue_button', 'correct_button', 'wrong_button'])
         self.buttons = ButtonList(Button('Continue'), Button('Correct'), Button('Incorrect'))
+        self.correct = False
 
     def handle_event(self, event):
         """
@@ -112,10 +113,12 @@ class InputState(State):
             if self.buttons.correct_button.was_clicked():
                 player.answer_question(True, wager)
                 self.input = ''
+                self.correct = True
                 return True
             if self.buttons.wrong_button.was_clicked():
                 player.answer_question(False, wager)
                 self.input = ''
+                self.correct = False
                 return True
         return False
 

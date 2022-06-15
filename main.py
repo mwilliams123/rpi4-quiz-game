@@ -13,6 +13,7 @@ from constants import GameState
 from hall_of_fame import Hall
 from loading import LoadingScreen
 from question import Question
+from tie_breaker import TieBreaker
 from title import TitleScreen
 from util import Font, SoundEffects
 
@@ -31,6 +32,7 @@ def main():
         GameState.DAILY_DOUBLE: DailyDouble(),
         GameState.FINAL: Final(),
         GameState.HALL: Hall(),
+        GameState.TIE: TieBreaker(),
     })
     game.run()
     pygame.quit()

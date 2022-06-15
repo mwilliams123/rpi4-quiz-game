@@ -62,12 +62,21 @@ class Final(InputState):
                 self.show_answer = True
                 self.players_left = player_manager.sort_players()
         if self.show_answer and self.winner is None:
-            player = self.players_left[0]
-            if self.answer_question(player):
-                self.players_left.pop(0)
-            if len(self.players_left) <= 0:
+            if len(self.players_left) > 0:
+                player = self.players_left[0]
+                if self.answer_question(player):
+                    self.players_left.pop(0)
+
+            if len(self.players_left) == 0:
                 # show winner
-                self.winner = player_manager.get_winner()
+                candidates = player_manager.get_winner()
+                if len(candidates) == 1:
+                    self.winner = candidates[0]
+                else:
+                    # tie breaker
+                    self.store['candidates'] = candidates
+                    return GameState.TIE
+            
         if self.winner is not None:
             if self.clicked and self.return_button.was_clicked():
                 return GameState.HALL

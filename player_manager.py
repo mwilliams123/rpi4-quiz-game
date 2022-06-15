@@ -34,7 +34,7 @@ class PlayerManager():
         for player in self.players:
             player.score = 0
 
-    def green_light(self):
+    def green_light(self, eligible='all'):
         """Turns on light to let players know they can ring in.
 
         Called immediately after a question is read."""
@@ -42,7 +42,8 @@ class PlayerManager():
         self.rung_in = None
         self.timer = 5000
         for player in self.players:
-            player.eligible = True
+            if eligible == 'all' or player in eligible:
+                player.eligible = True
         self.green = True
 
     def reset(self):
@@ -129,12 +130,14 @@ class PlayerManager():
     def get_winner(self):
         "Returns id number of player with highest score."
         highest = 0
-        winner = None
+        winners = []
         for player in self.players:
             if player.score > highest:
                 highest = player.score
-                winner = player.number
-        return winner
+        for player in self.players:
+            if player.score == highest:
+                winners.append(player)
+        return winners
 
     def sort_players(self):
         """Get list of players sorted according to final reveal order.
