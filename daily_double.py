@@ -63,6 +63,7 @@ class DailyDouble(InputState):
                 if self.clicked:
                     player = player_manager.players[player_manager.control]
                     if self.answer_question(player):
+                        player.stats.record_daily_double(self.correct)
                         return GameState.BOARD
             else:
                 # Count down time left to answer
@@ -78,6 +79,7 @@ class DailyDouble(InputState):
                         correct = resp == "True"
                         player = player_manager.players[player_manager.control]
                         player.answer_question(correct, self.wager)
+                        player.stats.record_daily_double(correct)
                         return GameState.BOARD
         self.clicked = False # reset flag
         return GameState.DAILY_DOUBLE

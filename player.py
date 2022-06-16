@@ -48,11 +48,10 @@ class Player:
 
         Checks if player is allowed to ring in, locks them out for 0.25 seconds if they
         rung in too early."""
-
+        self.stats.record_buzzer()
         if self.eligible and not self.locked_out:
             # Player rung in successfully
             self.manager.ring_in(self.number)
-            self.stats.record_buzzer()
             self.led.on()
         elif not self.locked_out:
             # Player rung in too early, lock them out
@@ -76,3 +75,5 @@ class Player:
             self.score += value
         else:
             self.score -= value
+
+        self.stats.record_answer(correct)

@@ -147,3 +147,11 @@ class PlayerManager():
         """
         players = filter(lambda p: p.score > 0, self.players)
         return sorted(players, key=lambda p: p.score)
+
+    def log_clue(self):
+        for player in self.players:
+            player.stats.record_clue()
+
+    def log_question_stats(self):
+        for player in self.players:
+            player.stats.record_questions_stats()

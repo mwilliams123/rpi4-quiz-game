@@ -45,6 +45,7 @@ class Question(State):
         self.timer = 5000
         host = self.store['host']
         player_manager.reset()
+        player_manager.log_clue()
         if host is not None:
             # send answer to host
             host.send("answer: " + store['clue']['question'])
@@ -88,9 +89,11 @@ class Question(State):
             elif self.clicked:
                 # Correct/incorrect button to indicate if player who rung in answered correctly
                 if self.buttons.correct_button.was_clicked():
+                    player_manager.log_question_stats()
                     player_manager.update(True,self.store['clue']['value'])
                     return GameState.BOARD
                 if self.buttons.wrong_button.was_clicked():
+                    player_manager.log_question_stats()
                     player_manager.update(False,self.store['clue']['value'])
                     return GameState.BOARD
         else:
@@ -123,6 +126,7 @@ class Question(State):
                 if host is not None:
                     resp = host.poll()
                     if resp == "True":
+                        player_manager.log_question_stats()
                         player_manager.reset()
                         player_manager.update(True,self.store['clue']['value'])
                         return GameState.BOARD
