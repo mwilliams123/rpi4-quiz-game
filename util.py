@@ -182,6 +182,18 @@ class TTS():
     channel = None
 
     @classmethod
+    def prepare_speech(cls, text):
+        """Prepares text to be read aloud. 
+
+        Args:
+            text (string): raw text from clue database 
+
+        Returns:
+            string: cleaned text
+        """
+        return text.replace('____', ' blank ')
+
+    @classmethod
     def play_speech(cls, text):
         """Uses google TTS to read given text aloud.
 
@@ -189,7 +201,7 @@ class TTS():
             text (str): Words to be read aloud
         """
         # generate sound file
-        tts = gTTS(text)
+        tts = gTTS(cls.prepare_speech(text))
         # save sound output in buffer
         bytes_stream = BytesIO()
         tts.write_to_fp(bytes_stream)
