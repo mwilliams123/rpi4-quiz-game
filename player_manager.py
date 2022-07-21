@@ -60,11 +60,11 @@ class PlayerManager():
         Returns:
             boolean: True if player timer has expired
         """
+        # count down timer of player that rung in
+        self.timer -= elapsed_time
         if self.timer <= 0:
             return True
 
-        # count down timer of player that rung in
-        self.timer -= elapsed_time
         return False
 
     def ring_in(self, player_id):
