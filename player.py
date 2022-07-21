@@ -48,8 +48,8 @@ class Player:
 
         if self.eligible and not self.locked_out:
             # Player rung in successfully
-            self.led.on()
             self.manager.ring_in(self.number)
+            self.led.on()
         elif not self.locked_out:
             # Player rung in too early, lock them out
             self.locked_out = True
