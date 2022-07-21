@@ -78,7 +78,7 @@ class PlayerManager():
             player.eligible = False
         self.stoplight.color = (0, 0, 0)
 
-    def update(self, correct, value):
+    def update(self, correct, value, hosted=False):
         """Adds clue's dollar amount to player's score if answer is correct,
         otherwise decrements their score. Gives them control of board if correct.
 
@@ -91,6 +91,14 @@ class PlayerManager():
         # give control to player with correct answer
         if correct:
             self.control = self.rung_in
+        elif hosted:
+            # allow players to ring in again
+            self.stoplight.color = (0, 1, 0)
+            self.timer = 5000
+            for player in self.players:
+                player.eligible = True
+            self.players[self.rung_in].eligible = False
+
         self.rung_in = None
 
     def second_chance(self):
