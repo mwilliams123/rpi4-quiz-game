@@ -6,6 +6,8 @@ from gpiozero import Button, LED, Device
 from gpiozero.pins.mock import MockFactory
 from gpiozero.exc import BadPinFactory
 
+from player_stats import PlayerStats
+
 class Player:
     """Representation of a player and associated hardware in the game.
 
@@ -30,6 +32,7 @@ class Player:
         self.number = number
         self.manager = manager
         self.locked_out = False
+        self.stats = PlayerStats()
         try:
             self.buzzer = Button(buzzer_pin)
             self.led = LED(led_pin)
@@ -49,6 +52,7 @@ class Player:
         if self.eligible and not self.locked_out:
             # Player rung in successfully
             self.manager.ring_in(self.number)
+            self.stats.record_buzzer()
             self.led.on()
         elif not self.locked_out:
             # Player rung in too early, lock them out
