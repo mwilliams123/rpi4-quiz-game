@@ -52,21 +52,24 @@ class Host():
         Waits for host to click a button to return to board."""
         # Check if buttons have been clicked to return to board
         if self.clicked:
+            self.clicked = False
             if self.rang_in:
                 # Correct/incorrect button to indicate if player who rung in answered correctly
                 if self.buttons.correct_button.was_clicked():
                     self.correct = True
+                    self.rang_in = False
                     return True
                 if self.buttons.wrong_button.was_clicked():
                     self.correct = False
+                    self.rang_in = False
                     return True
 
             elif self.timer_expired:
                 # continue button if no one rings in
-                if self.clicked and self.buttons.continue_button.was_clicked():
+                if self.buttons.continue_button.was_clicked():
+                    print("continue clicked")
                     self.correct = True
                     return True
-        self.clicked = False
         return False
 
     def draw(self, screen, text):

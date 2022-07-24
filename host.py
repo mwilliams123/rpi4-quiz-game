@@ -55,8 +55,10 @@ def main():
         if host.update():
             # button was clicked, send back
             s.send(str(host.correct).encode())
-            text = ''
-            host.startup()
+            if host.correct or host.timer_expired:
+                # reset
+                host.startup()
+                text = ''
         # Display screen
         pygame.display.flip()
         clock.tick(40)
