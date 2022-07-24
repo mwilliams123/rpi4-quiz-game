@@ -44,6 +44,7 @@ class Question(State):
         self.rang_in = False
         self.timer = 5000
         host = self.store['host']
+        player_manager.reset()
         if host is not None:
             # send answer to host
             host.send("answer: " + store['clue']['question'])
@@ -80,7 +81,7 @@ class Question(State):
 
         if self.show_answer:
             # Check if buttons have been clicked to return to board
-            if player_manager.rung_in is None:
+            if not self.rang_in:
                 # continue button if no one rings in
                 if self.clicked and self.buttons.continue_button.was_clicked():
                     return GameState.BOARD
@@ -109,7 +110,7 @@ class Question(State):
                         if resp:
                             return GameState.BOARD
                     else:
-                        player_manager.reset()
+                        #player_manager.reset()
                         SoundEffects.play(1) # time's up
                         self.show_answer = True
             else:
@@ -129,13 +130,13 @@ class Question(State):
                         self.timer = 5000
                         player_manager.second_chance()
                         player_manager.update(False,self.store['clue']['value'])
+                        self.rang_in = False
                         return GameState.QUESTION
 
                 if player_manager.timer > 0:
                     if player_manager.poll(elapsed_time):
                         # out of time
                         if host is None:
-                            player_manager.reset()
                             self.show_answer = True
                         else:
                             SoundEffects.play(1) # time's up

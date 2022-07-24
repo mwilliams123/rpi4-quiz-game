@@ -110,6 +110,7 @@ class PlayerManager():
         self.stoplight.color = (0, 1, 0)
         self.timer = 5000
         for player in self.players:
+            player.led.off()
             player.eligible = True
         self.players[self.rung_in].eligible = False
 

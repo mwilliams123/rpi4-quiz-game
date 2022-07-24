@@ -78,6 +78,7 @@ class DailyDouble(InputState):
                         correct = resp == "True"
                         player = player_manager.players[player_manager.control]
                         player.answer_question(correct, self.wager)
+                        return GameState.BOARD
         self.clicked = False # reset flag
         return GameState.DAILY_DOUBLE
 
