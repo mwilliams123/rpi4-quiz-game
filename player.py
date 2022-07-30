@@ -52,6 +52,7 @@ class Player:
         if self.eligible and not self.locked_out:
             # Player rung in successfully
             self.manager.ring_in(self.number)
+            self.stats.record_answer()
             self.led.on()
         elif not self.locked_out:
             # Player rung in too early, lock them out
@@ -75,5 +76,3 @@ class Player:
             self.score += value
         else:
             self.score -= value
-
-        self.stats.record_answer(correct)

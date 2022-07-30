@@ -39,6 +39,7 @@ class Stats(State):
         self.continue_button = Button('Return')
         self.clicked = False
         self.stats = []
+        self.triple_stumpers = 0
 
     def startup(self, store, player_manager):
         # players data
@@ -49,19 +50,21 @@ class Stats(State):
                 buz_pct = 'N/A'
                 
             else:
-                buz_pct = int(100*buzzer/attempts)
+                buz_pct = str(int(100*buzzer/attempts)) + '%'
             if buzzer == 0:
                 correct_pct = 'N/A'
             else:
-                correct_pct = int(100*player.stats.correct/buzzer)
+                correct_pct = str(int(100*player.stats.correct/buzzer)) + '%'
             not_correct = buzzer - player.stats.correct
+            daily_double_str = str(len(player.stats.daily_doubles)) + ' ' + ', '.join(player.stats.daily_doubles)
             player_stats = [player.number+1, attempts, buzzer, buz_pct, str(player.stats.correct) + '/' + str(not_correct),
-                correct_pct, player.stats.daily_doubles, player.score]
+                correct_pct, daily_double_str, '$' + str(player.score)]
             rendered_text = []
             for stat in player_stats:
                 rendered_text.append(Font.category.render( str(stat),  True, Colors.WHITE))
             self.stats.append(rendered_text)
         self.store = store
+        self.triple_stumpers = player_manager.triple_stumpers
        
 # Draw for scores
     def draw(self, screen):
@@ -92,7 +95,9 @@ class Stats(State):
                 rect = text.get_rect(midleft=(50 + box_width*i, 250 + j*50))
                 screen.blit(text,rect)
     
-
+        text = Font.category.render('Triple stumpers: ' + str(self.triple_stumpers), True, Colors.WHITE)
+        rect = text.get_rect(center=(width/2, 400))
+        screen.blit(text,rect)
     # KEY (inside gray rectangle): 
     # ATT: Attempts to Buzz in; 
     # BUZ - Number of times contesntant buzzed in; 

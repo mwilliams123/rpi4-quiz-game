@@ -3,9 +3,7 @@ class PlayerStats:
         self.attempts = 0
         self.questions_answered = 0
         self.correct = 0
-        self.daily_doubles = 0
-        self.daily_doubles_correct = 0
-
+        self.daily_doubles = []
         self.buzzers = 0
         self.active_round = False
 
@@ -22,15 +20,17 @@ class PlayerStats:
             self.buzzers = 0
         self.active_round = False
 
-    def record_answer(self, correct):
+    def record_answer(self):
         self.questions_answered += 1
-        if correct:
-            self.correct += 1
 
-    def record_daily_double(self, correct):
-        self.daily_doubles += 1
+    def record_correct(self):
+        self.correct += 1
+
+    def record_daily_double(self, amt, correct):
         if correct:
-            self.daily_doubles_correct += 1
+            self.daily_doubles.append('$' + str(amt))
+        else:
+            self.daily_doubles.append('-$' + str(amt))
 
     def print_stats(self):
         print('Questions attempted: ' + str(self.attempts))

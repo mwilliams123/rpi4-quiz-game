@@ -4,7 +4,7 @@ import select
 class Server():
     """Class for managing communication with Host when game is run in hosted mode.
     """
-    def __init__(self, port=8080):
+    def __init__(self, port=8081):
         # get LAN address
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect(("8.8.8.8", 80))

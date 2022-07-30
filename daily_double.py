@@ -4,7 +4,7 @@ Implement Daily Double
 from constants import GameState, Colors
 from util import TTS, SoundEffects, display_text, Font
 from state import InputState
-
+import time
 class DailyDouble(InputState):
     """Handles the implementation of Daily Double questions.
 
@@ -55,6 +55,7 @@ class DailyDouble(InputState):
                 if host is not None:
                     # send answer to host
                     host.send("answer: " + self.store['clue']['question'])
+                    time.sleep(0.5)
                     host.send("rangin")
                 TTS.play_speech(self.store['clue']['answer']) # read question
         else:
@@ -63,7 +64,7 @@ class DailyDouble(InputState):
                 if self.clicked:
                     player = player_manager.players[player_manager.control]
                     if self.answer_question(player):
-                        player.stats.record_daily_double(self.correct)
+                        player.stats.record_daily_double(self.wager, self.correct)
                         return GameState.BOARD
             else:
                 # Count down time left to answer
@@ -79,7 +80,7 @@ class DailyDouble(InputState):
                         correct = resp == "True"
                         player = player_manager.players[player_manager.control]
                         player.answer_question(correct, self.wager)
-                        player.stats.record_daily_double(correct)
+                        player.stats.record_daily_double(self. wager, correct)
                         return GameState.BOARD
         self.clicked = False # reset flag
         return GameState.DAILY_DOUBLE

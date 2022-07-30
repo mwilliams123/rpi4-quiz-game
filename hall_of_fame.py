@@ -63,7 +63,7 @@ class Hall(State):
 
     def update_scores(self, player_manager):
         """Write score to file."""
-        winner = player_manager.players[player_manager.get_winner()]
+        winner = player_manager.get_winner()[0]
         self.scores.append({'name': self.input, 'score': winner.score})
         self.scores = sorted(self.scores, key=lambda x: x['score'], reverse=True)
         for i,score in enumerate(self.scores):

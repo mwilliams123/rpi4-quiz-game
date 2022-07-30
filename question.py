@@ -111,9 +111,11 @@ class Question(State):
                         # wait for host to continue
                         resp = host.poll()
                         if resp:
+                            player_manager.triple_stumpers += 1
+                            player_manager.log_question_stats()
                             return GameState.BOARD
                     else:
-                        #player_manager.reset()
+                        player_manager.triple_stumpers += 1
                         SoundEffects.play(1) # time's up
                         self.show_answer = True
             else:

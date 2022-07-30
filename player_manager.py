@@ -29,6 +29,7 @@ class PlayerManager():
         self.control = 0
         self.timer = 5000
         self.green = False
+        self.triple_stumpers = 0
 
     def zero_scores(self):
         for player in self.players:
@@ -96,6 +97,7 @@ class PlayerManager():
         # give control to player with correct answer
         if correct:
             self.control = self.rung_in
+            self.players[self.rung_in].stats.record_correct()
         elif hosted:
             # allow players to ring in again
             self.stoplight.color = (0, 1, 0)
