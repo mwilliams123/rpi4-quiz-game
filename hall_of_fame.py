@@ -57,7 +57,7 @@ class Hall(State):
                 self.update_scores(player_manager)
                 self.new_entry = False
             if self.continue_button.was_clicked():
-                return GameState.TITLE
+                return GameState.STATS
         self.clicked = False
         return GameState.HALL
 

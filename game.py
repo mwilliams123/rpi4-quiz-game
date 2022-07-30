@@ -84,7 +84,7 @@ class Game():
 
     def draw(self):
         """Draws the current frame to the screen."""
-        if self.state.name in (GameState.TITLE, GameState.LOADING, GameState.INTRO, GameState.HALL):
+        if self.state.name in (GameState.STATS, GameState.TITLE, GameState.LOADING, GameState.INTRO, GameState.HALL):
             self.state.draw(self.screen)
         else:
             # draw score board

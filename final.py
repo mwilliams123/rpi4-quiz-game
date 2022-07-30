@@ -115,7 +115,7 @@ class Final(InputState):
             # Display either the question or answer depending on if time has run out
             if self.show_answer:
                 if self.winner is not None:
-                    text = "Player " + str(self.winner + 1) + " wins!"
+                    text = "Player " + str(self.winner.number + 1) + " wins!"
                     display_text(screen, text, Font.number, (100, 100, width-100, height-100))
                     self.return_button.draw(screen, (width/2, height*3/4))
                 else:

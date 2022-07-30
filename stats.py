@@ -1,6 +1,6 @@
 # Daily Box Scores
 import pygame
-from util import display_text, Font
+from util import Button, display_text, Font
 from state import State
 from constants import Colors, GameState
 
@@ -38,6 +38,30 @@ class Stats(State):
         self.name = GameState.STATS
         self.continue_button = Button('Return')
         self.clicked = False
+        self.stats = []
+
+    def startup(self, store, player_manager):
+        # players data
+        for player in player_manager.players:
+            buzzer = player.stats.questions_answered
+            attempts = player.stats.attempts
+            if attempts == 0:
+                buz_pct = 'N/A'
+                
+            else:
+                buz_pct = int(100*buzzer/attempts)
+            if buzzer == 0:
+                correct_pct = 'N/A'
+            else:
+                correct_pct = int(100*player.stats.correct/buzzer)
+            not_correct = buzzer - player.stats.correct
+            player_stats = [player.number+1, attempts, buzzer, buz_pct, str(player.stats.correct) + '/' + str(not_correct),
+                correct_pct, player.stats.daily_doubles, player.score]
+            rendered_text = []
+            for stat in player_stats:
+                rendered_text.append(Font.category.render( str(stat),  True, Colors.WHITE))
+            self.stats.append(rendered_text)
+        self.store = store
        
 # Draw for scores
     def draw(self, screen):
@@ -47,8 +71,8 @@ class Stats(State):
     # x, y, width, height   (coordinates of top left corner)
         width, height = screen.get_size()
     # draw title; Jeopardy! Daily Box Score, date
-        text = Font.category.render('GAME TOTALS', True, Colors.GOLD)
-        rect = text.get_rect(center=(width/2, height/2))
+        text = Font.number.render('GAME TOTALS', True, Colors.GOLD)
+        rect = text.get_rect(center=(width/2, 100))
         screen.blit(text,rect)
         self.continue_button.draw(screen, (width*1/2, height*3.5/4))
         
@@ -56,20 +80,17 @@ class Stats(State):
        # pygame.draw.rect(screen, Colors.BLUE, pygame.Rect(30, 30, width, 20))
        # pygame.display.blit()
     # Column Headings: Player, ATT, BUZ, BUZ %
-        text = Font.category.render('PLAYER' + '    ' + 'ATT' + '    ' + 'BUZ' + '    ' + 'BUZ%' + '    ' 
-        + '   ' + 'COR/INC' + '    ' + 'CORRECT %' + '    ' + 'DD' + '    ' + 'FINAL SCORE', True, Colors.WHITE)
-        rect = text.get_rect(midleft=(width/2 - 100, height/4 + (i+1)*30))
-        screen.blit(text,rect)
-        
-    # players data
-        for player in player_manager.players:
-            buz_pct = player.buzzer/player.attempts
-            correct_pct = player.correct/(player.correct + player.not_correct)
-            text = Font.category.render( str(player.num+1) + '    ' + str(player.attempts) + str(player.buzzers) + '    ' +
-                str(buz_pct) + '    ' + str(player.correct) + '/' + str(player.not_correct) + '    ' + str(correct_pct) + '   ' +
-                str(player.dd) + '   ' + str(player.score), True, Colors.WHITE)
-            rect = text.get_rect(midleft=(width/2 + 100, height/4 + (i+1)*30))
+        stats = ['PLAYER', 'ATT' , 'BUZ' , 'BUZ%' ,  'COR/INC', 'CORRECT %' ,'DD' , 'FINAL SCORE']
+        for i, stat in enumerate(stats):
+            text = Font.category.render(stat, True, Colors.WHITE)
+            box_width = (width - 50) / len(stats)
+            rect = text.get_rect(midleft=(50 + box_width*i, 200))
             screen.blit(text,rect)
+        
+            for j, player_stats in enumerate(self.stats):
+                text = player_stats[i]
+                rect = text.get_rect(midleft=(50 + box_width*i, 250 + j*50))
+                screen.blit(text,rect)
     
 
     # KEY (inside gray rectangle): 

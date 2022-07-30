@@ -78,7 +78,7 @@ class LoadingScreen(State):
                 return GameState.LOADING
             self.store['round'] = 0
             if host is None or host.is_connected():
-                return GameState.BOARD
+                return GameState.INTRO
         return GameState.LOADING
 
     def check_data(self):
