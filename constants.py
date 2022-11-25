@@ -27,6 +27,7 @@ class GameState(Enum):
     HALL = 8
     TIE = 9
     STATS = 10
+    OPTIONS = 11
 
 @dataclass
 class Colors:

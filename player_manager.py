@@ -5,7 +5,8 @@ for other classes to access/update player score and status.
 from types import SimpleNamespace
 import gpiozero
 from player import Player
-
+buzzer_pins = [6,21,17, 22, 26]
+led_pins = [19, 16, 12, 27, 13]
 class PlayerManager():
     """
     Class for keeping track of players and hardware.
@@ -19,7 +20,7 @@ class PlayerManager():
         timer (int): Time in milliseconds left to answer question
     """
     def __init__(self):
-        self.players = [Player(19, 6, 0, self), Player(16, 21, 1, self), Player(12, 17, 2, self)]
+        self.players = []
         try:
             self.stoplight = gpiozero.RGBLED(red=18, blue=24, green=23)
         except gpiozero.exc.PinPWMUnsupported:
@@ -30,6 +31,12 @@ class PlayerManager():
         self.timer = 5000
         self.green = False
         self.triple_stumpers = 0
+
+    def initialize_players(self, num_players):
+        # Player(19, 6, 0, self), Player(16, 21, 1, self), Player(12, 17, 2, self)
+        for i in range(num_players):
+            player = Player(led_pins[i], buzzer_pins[i], i, self)
+            self.players.append(player)
 
     def zero_scores(self):
         for player in self.players:

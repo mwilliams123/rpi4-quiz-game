@@ -1,13 +1,13 @@
 """
-Display Title screen.
+Display Options screen.
 """
 import pygame
 from constants import GameState, Colors
 from util import Button, Font
 from state import State
 
-class TitleScreen(State):
-    """Game State that shows a simple title screen and play button.
+class OptionsScreen(State):
+    """Game State that shows a simple Options screen and play button.
 
     Attributes:
         name (GameState): Enum that represents this game state
@@ -16,10 +16,10 @@ class TitleScreen(State):
         """
     def __init__(self):
         super().__init__()
-        self.name = GameState.TITLE
-        self.play_button = Button("Play", Font.get_font(Font.BIG))
-        self.hall_button = Button("Hall of Fame")
-        self.options = Button("Options")
+        self.name = GameState.OPTIONS
+        self.back = Button("Back")
+        self.hosted_toggle = Button("OFF")
+        self.num_players_toggle = Button("3")
         self.clicked = False
         self.initialize_store()
 
@@ -30,9 +30,8 @@ class TitleScreen(State):
         Args:
             store (dict of str: Any): Dictionary of persistent data passed from state to state
         """
-        self.store = store
-        if 'n_players' not in store:
-            self.initialize_store()
+        self.store = {}
+        self.initialize_store()
 
     def initialize_store(self):
         self.store['hosted'] = False
@@ -58,19 +57,23 @@ class TitleScreen(State):
 
         Returns:
             GameState: Returns LOADING state when start button was clicked, otherwise continues
-                to return TITLE state.
+                to return Options state.
         """
         # determine if start button clicked
         if self.clicked:
-            if self.play_button.was_clicked():
-                return GameState.LOADING
-            if self.hall_button.was_clicked():
-                return GameState.HALL
-            if self.options.was_clicked():
-                return GameState.OPTIONS
+            if self.back.was_clicked():
+                return GameState.TITLE
+            if self.hosted_toggle.was_clicked():
+                self.store['hosted'] = not self.store['hosted']
+                self.hosted_toggle.set_text('ON' if self.store['hosted'] else 'OFF')
+            if self.num_players_toggle.was_clicked():
+                self.store['n_players'] = self.store['n_players'] + 1
+                if self.store['n_players'] > 5:
+                    self.store['n_players'] = 2
+                self.num_players_toggle.set_text(str(self.store['n_players']))
 
         self.clicked = False # reset flag for next loop
-        return GameState.TITLE
+        return GameState.OPTIONS
 
     def draw(self, screen):
         """
@@ -84,6 +87,14 @@ class TitleScreen(State):
 
         # draw start button in center of screen
         width, height = screen.get_size()
-        self.play_button.draw(screen, (width/2, height/3))
-        self.hall_button.draw(screen, (width/2, height*3/4))
-        self.options.draw(screen, (width/2, height*7/12))
+        self.back.draw(screen, (40, 20))
+        text = Font.button.render("Hosted Mode", True, Colors.WHITE)
+        text_rect = text.get_rect(center=(width/4, height/2))
+        screen.blit(text, text_rect)
+        self.hosted_toggle.draw(screen, (width*3/4, height/2))
+
+        text = Font.button.render("Num Players", True, Colors.WHITE)
+        text_rect = text.get_rect(center=(width/4, height/2 + 100))
+        screen.blit(text, text_rect)
+        self.num_players_toggle.draw(screen, (width*3/4, height/2 + 100))
+       

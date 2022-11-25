@@ -17,15 +17,17 @@ from stats import Stats
 from tie_breaker import TieBreaker
 from title import TitleScreen
 from util import Font, SoundEffects
+from options import OptionsScreen
 
 def main():
     """Initializes pygame display, loads resources, & launches game."""
     pygame.init()
     SoundEffects.load_sounds()
     Font.load_fonts()
-    screen = pygame.display.set_mode((1300,700))
+    screen = pygame.display.set_mode((1600,1000))
     game = Game(screen, {
         GameState.TITLE: TitleScreen(),
+        GameState.OPTIONS: OptionsScreen(),
         GameState.LOADING: LoadingScreen(),
         GameState.INTRO: IntroScreen(),
         GameState.BOARD: Board(),

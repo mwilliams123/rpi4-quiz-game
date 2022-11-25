@@ -96,7 +96,7 @@ class Stats(State):
                 screen.blit(text,rect)
     
         text = Font.category.render('Triple stumpers: ' + str(self.triple_stumpers), True, Colors.WHITE)
-        rect = text.get_rect(center=(width/2, 400))
+        rect = text.get_rect(center=(width/2, len(self.stats)*50 + 300))
         screen.blit(text,rect)
     # KEY (inside gray rectangle): 
     # ATT: Attempts to Buzz in; 

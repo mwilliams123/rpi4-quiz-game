@@ -96,8 +96,8 @@ class Hall(State):
                 if i == self.place:
                     color = Colors.GOLD
                 text = Font.category.render(str(i+1) + '. ' + self.scores[i]['name'], True, color)
-                rect = text.get_rect(midleft=(width/2 - 100, height/4 + (i+1)*30))
+                rect = text.get_rect(midleft=(width/2 - 100, height/4 + (i+1)*50))
                 screen.blit(text,rect)
                 text = Font.category.render( '$' + str(self.scores[i]['score']), True, color)
-                rect = text.get_rect(midleft=(width/2 + 100, height/4 + (i+1)*30))
+                rect = text.get_rect(midleft=(width/2 + 100, height/4 + (i+1)*50))
                 screen.blit(text,rect)

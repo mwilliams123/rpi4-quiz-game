@@ -9,16 +9,18 @@ class Score:
     """_summary_
     """
 
-    def __init__(self, num_players) -> None:
+    def __init__(self) -> None:
         self.score_boxes = []
-        self.screen = pygame.Surface((300, 700))
+        self.clicked = False
+        self.editing = None
+        self.edit_text = ''
+
+    def make_score_boxes(self, num_players):
+        self.screen = pygame.Surface((300, 1000))
         width, height = self.screen.get_size()
         box_height = height / num_players
         for i in range(num_players):
             self.score_boxes.append((0, i*box_height, width, box_height)) # box for player's score
-        self.clicked = False
-        self.editing = None
-        self.edit_text = ''
 
     def edit_score(self, player_manager):
         """Set score box to be edited."""
@@ -49,6 +51,9 @@ class Score:
             except ValueError:
                 print("Invalid input. Must be a number")
             self.editing = None
+
+        if len(self.score_boxes) == 0 and len(player_manager.players) > 0:
+            self.make_score_boxes(len(player_manager.players))
 
     def display_score(self, player_manager):
         """Draws the score board.

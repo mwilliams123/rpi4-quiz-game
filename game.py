@@ -38,12 +38,12 @@ class Game():
                 Defaults to GameState.TITLE.
         """
         self.screen = screen
-        self.game_board = pygame.Surface((1000, 700))
+        self.game_board = pygame.Surface((1300, 1000))
         self.clock = pygame.time.Clock()
         self.states = states
         self.state = states[start_state]
         self.player_manager = PlayerManager()
-        self.score_board = Score(len(self.player_manager.players))
+        self.score_board = Score()
 
     def handle_events(self):
         """Handles events like mouse clicks, keyboard presses.
@@ -84,12 +84,12 @@ class Game():
 
     def draw(self):
         """Draws the current frame to the screen."""
-        if self.state.name in (GameState.STATS, GameState.TITLE, GameState.LOADING, GameState.INTRO, GameState.HALL):
+        if self.state.name in (GameState.STATS, GameState.OPTIONS, GameState.TITLE, GameState.LOADING, GameState.INTRO, GameState.HALL):
             self.state.draw(self.screen)
         else:
             # draw score board
             self.score_board.display_score(self.player_manager)
-            self.screen.blit(self.score_board.screen, (1000,0))
+            self.screen.blit(self.score_board.screen, (1300,0))
             # draw the game board
             self.state.draw(self.game_board)
             self.screen.blit(self.game_board, (0,0))

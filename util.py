@@ -33,8 +33,8 @@ class Font():
         cls._fonts[cls.CLUE]= pygame.font.Font('fonts/Caudex-Bold.ttf', 60)
         cls._fonts[cls.CLUE_SMALL]= pygame.font.Font('fonts/Caudex-Bold.ttf', 50)
         cls._fonts[cls.CLUE_SMALLEST]= pygame.font.Font('fonts/Caudex-Bold.ttf', 40)
-        cls._fonts[cls.NUMBER] = pygame.font.Font('fonts/Anton-Regular.ttf', 60)
-        cls._fonts[cls.CATEGORY] = pygame.font.Font('fonts/Anton-Regular.ttf', 24)
+        cls._fonts[cls.NUMBER] = pygame.font.Font('fonts/Anton-Regular.ttf', 80)
+        cls._fonts[cls.CATEGORY] = pygame.font.Font('fonts/Anton-Regular.ttf', 36)
 
     @classmethod
     def get_font(cls, font):

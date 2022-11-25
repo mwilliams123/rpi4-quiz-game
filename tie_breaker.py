@@ -34,6 +34,7 @@ class TieBreaker(State):
         self.question = None
         self.thread = None
         self.winner = None
+        self.loading = False
         self.show_category = True
 
     def startup(self, store, player_manager):
@@ -55,11 +56,13 @@ class TieBreaker(State):
         self.question = None
         self.show_category = True
         self.thread = threading.Thread(target=self.load_question)
+        self.loading = True
         self.thread.start()
 
     def load_question(self):
         data = requests.get('http://mathnerd7.pythonanywhere.com/one')
         self.question = data.json()
+        self.loading = False
 
     def play_question(self):
         TTS.play_speech(self.question['answer'])
@@ -91,13 +94,12 @@ class TieBreaker(State):
                 no one rung in. Continues to return QUESTION otherwise.
         """
         host = self.store['host']
-        if TTS.is_busy():
+        if TTS.is_busy() or self.loading:
             # question is still being read
             return GameState.TIE
-        if not player_manager.green:
+        if not player_manager.green and not self.show_category:
             # turn on light to let players know to ring in
             player_manager.green_light(eligible=self.store['candidates'])
-
         if self.winner is not None:
             if self.clicked and self.buttons.continue_button.was_clicked():
                 return GameState.HALL
@@ -161,7 +163,7 @@ class TieBreaker(State):
                             self.show_answer = True
                         else:
                             SoundEffects.play(1) # time's up
-
+       
         self.clicked = False # reset flag
         return GameState.TIE
 
@@ -182,14 +184,21 @@ class TieBreaker(State):
         elif self.show_answer:
             # draw answer
             text = self.question['question']
-            display_text(screen, text.upper(), Font.clue, (100, 100, width-100, height-100))
             if self.rang_in:
-                # draw correct/incorrect buttons
-                self.buttons.correct_button.draw(screen, (width*1/4, height*3/4))
-                self.buttons.wrong_button.draw(screen, (width*3/4, height*3/4))
+                if self.winner is not None:
+                    text = "Player " + str(self.winner + 1) + " wins!"
+                    display_text(screen, text, Font.number, (100, 100, width-100, height-100))
+                    self.buttons.continue_button.draw(screen, (width/2, height*3/4))
+                    return
+                else:
+                    # draw correct/incorrect buttons
+                    self.buttons.correct_button.draw(screen, (width*1/4, height*3/4))
+                    self.buttons.wrong_button.draw(screen, (width*3/4, height*3/4))
             else:
                 # draw continue button
                 self.buttons.continue_button.draw(screen, (width*1/2, height*3/4))
+            display_text(screen, text.upper(), Font.clue, (100, 100, width-100, height-100))
+            
         elif self.show_category:
             # display category
             text = self.question['category']

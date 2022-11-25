@@ -40,7 +40,7 @@ class LoadingScreen(State):
             self.store['host'] = Server()
         else:
             self.store['host'] = None
-        #player_manager.zero_scores()
+        player_manager.initialize_players(self.store['n_players'])
 
     def fetch(self):
         """Fetches questions from the API and formats them into rounds."""
