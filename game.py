@@ -57,7 +57,7 @@ class Game():
                     # Exit game if escape key is pressed
                     return True
             if self.state.name == GameState.BOARD:
-                if event.type == pygame.MOUSEBUTTONUP and event.button == 1 and pygame.mouse.get_pos()[0] > 1000:
+                if event.type == pygame.MOUSEBUTTONUP and event.button == 1 and pygame.mouse.get_pos()[0] > 1300:
                     self.score_board.edit_score(self.player_manager)
                     return False
                 self.score_board.update_score(event, self.player_manager)
