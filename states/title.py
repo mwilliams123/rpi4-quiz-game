@@ -1,10 +1,9 @@
 """
 Display Title screen.
 """
-import pygame
-from constants import GameState, Colors
-from util import Button, Font
-from state import State
+from util.constants import GameState, Colors
+from util.util import Button, Font
+from states.state import State
 
 class TitleScreen(State):
     """Game State that shows a simple title screen and play button.
@@ -20,10 +19,9 @@ class TitleScreen(State):
         self.play_button = Button("Play", Font.get_font(Font.BIG))
         self.hall_button = Button("Hall of Fame")
         self.options = Button("Options")
-        self.clicked = False
         self.initialize_store()
 
-    def startup(self, store, player_manager):
+    def startup(self, store, _player_manager):
         """
         Executes once immediately after a state is transitioned into.
 
@@ -35,18 +33,9 @@ class TitleScreen(State):
             self.initialize_store()
 
     def initialize_store(self):
+        """Set default values for game options."""
         self.store['hosted'] = False
         self.store['n_players'] = 3
-
-    def handle_event(self, event):
-        """
-        Sets flag when left mouse is clicked.
-
-        Args:
-            event (Event): Pygame Event such as a mouse click or keyboard press.
-        """
-        if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-            self.clicked = True
 
     def update(self, player_manager, elapsed_time):
         """

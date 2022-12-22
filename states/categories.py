@@ -1,9 +1,9 @@
 """
 Read aloud categories and explanations.
 """
-from constants import GameState, Colors
-from state import State
-from util import TTS, display_text, Font
+from states.state import State
+from util.constants import GameState, Colors
+from util.util import TTS, display_text, Font
 
 class IntroScreen(State):
     """
@@ -20,7 +20,7 @@ class IntroScreen(State):
         self.categories = []
         self.index = 0
 
-    def startup(self, store, player_manager):
+    def startup(self, store, _player_manager):
         self.store = store
         self.index = 0
         # load categories for this round

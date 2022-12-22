@@ -2,9 +2,9 @@
 Draw game board & clue values.
 """
 import pygame
-from constants import Colors, GameState
-from util import display_text, Font
-from state import State
+from util.constants import Colors, GameState
+from util.util import display_text, Font
+from states.state import State
 
 class Board(State):
     """
@@ -24,8 +24,8 @@ class Board(State):
     def __init__(self):
         super().__init__()
         self.name = GameState.BOARD
-        self.clicked = False
         self.grid = ([], [])
+        self.show_score = True
 
     def startup(self, store, player_manager):
         """
@@ -37,16 +37,6 @@ class Board(State):
         self.store = store
         player_manager.reset()
         player_manager.show_control()
-
-    def handle_event(self, event):
-        """
-        Sets flag when left mouse is clicked.
-
-        Args:
-            event (Event): Pygame Event such as a mouse click or keyboard press.
-        """
-        if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-            self.clicked = True
 
     def update(self, player_manager, elapsed_time):
         """Checks if a clue was clicked on. Moves to the next round if no clues left.
@@ -129,7 +119,7 @@ class Board(State):
         round_ = self.store['round']
         for i, x_pos in enumerate(vertical_lines):
             for j, y_pos in enumerate(horizontal_lines):
-                if j > 0 and i < 6 and list(self.store['data'][round_].values())[i][j-1] is not None:
+                if j>0 and i<6 and list(self.store['data'][round_].values())[i][j-1] is not None:
                     draw_number(screen, j*200*(round_+1), (x_pos,y_pos, width//6, height//6))
 
         # draw categories

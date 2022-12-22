@@ -1,10 +1,9 @@
 """
 Display Options screen.
 """
-import pygame
-from constants import GameState, Colors
-from util import Button, Font
-from state import State
+from util.constants import GameState, Colors
+from util.util import Button, Font
+from states.state import State
 
 class OptionsScreen(State):
     """Game State that shows a simple Options screen and play button.
@@ -20,10 +19,10 @@ class OptionsScreen(State):
         self.back = Button("Back")
         self.hosted_toggle = Button("OFF")
         self.num_players_toggle = Button("3")
-        self.clicked = False
+        self.store = {}
         self.initialize_store()
 
-    def startup(self, store, player_manager):
+    def startup(self, store, _player_manager):
         """
         Executes once immediately after a state is transitioned into.
 
@@ -34,30 +33,21 @@ class OptionsScreen(State):
         self.initialize_store()
 
     def initialize_store(self):
+        """Assign default values for game options."""
         self.store['hosted'] = False
         self.store['n_players'] = 3
 
-    def handle_event(self, event):
-        """
-        Sets flag when left mouse is clicked.
-
-        Args:
-            event (Event): Pygame Event such as a mouse click or keyboard press.
-        """
-        if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-            self.clicked = True
-
     def update(self, player_manager, elapsed_time):
         """
-        Checks if start button has been clicked.
+        Toggle options when they are clicked.
 
         Args:
             player_manager (PlayerManager): Reference to manager that keeps track of players
             elapsed_time (int): Milliseconds that have passed since update() was last called
 
         Returns:
-            GameState: Returns LOADING state when start button was clicked, otherwise continues
-                to return Options state.
+            GameState: Returns TITLE state when back button was clicked, otherwise continues
+                to return OPTIONS state.
         """
         # determine if start button clicked
         if self.clicked:
@@ -97,4 +87,3 @@ class OptionsScreen(State):
         text_rect = text.get_rect(center=(width/4, height/2 + 100))
         screen.blit(text, text_rect)
         self.num_players_toggle.draw(screen, (width*3/4, height/2 + 100))
-       

@@ -1,48 +1,33 @@
+"""
+Implement the hall of fame list of high scores.
+"""
 import pickle
-import pygame
-from state import State
-from constants import Colors, GameState
-from util import Button, Font
+from states.state import InputState
+from util.constants import Colors, GameState
+from util.util import Button, Font
 
-class Hall(State):
+class Hall(InputState):
+    """Load and displays the top 10 all time high scorers."""
     def __init__(self):
         super().__init__()
         self.name = GameState.HALL
         self.scores = []
-        self.input = ''
         self.continue_button = Button('Return')
         self.enter_button = Button('Enter')
         self.new_entry = False
-        self.clicked = False
         self.place = None
 
-    def startup(self, store, player_manager):
+    def startup(self, store, _player_manager):
         try:
-            file = open('scores', 'rb')
-            self.scores = pickle.load(file)
-            file.close()
-        except Exception as error:
+            with open('scores', 'rb') as file:
+                self.scores = pickle.load(file)
+                file.close()
+        except FileNotFoundError as error:
             print(error)
             self.scores = []
         if 'round' in store and store['round'] >= 2:
             self.new_entry = True
         self.place = None
-
-    def handle_event(self, event):
-        """
-        Sets flag when left mouse is clicked. Captures user keyboard input.
-
-        Args:
-            event (Event): Pygame Event such as a mouse click or keyboard press.
-        """
-        if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-            self.clicked = True
-        elif event.type == pygame.KEYDOWN:
-            # update user input when key is pressed
-            if event.key == pygame.K_BACKSPACE:
-                self.input = self.input[:-1] # delete last digit
-            else:
-                self.input += event.unicode
 
     def update(self, player_manager, elapsed_time):
         """

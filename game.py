@@ -7,9 +7,9 @@ Usage Example:
     game.run()
 """
 import pygame
-from constants import GameState
-from score import Score
-from player_manager import PlayerManager
+from util.constants import GameState
+from util.score import Score
+from player.player_manager import PlayerManager
 
 class Game():
     """
@@ -57,9 +57,10 @@ class Game():
                     # Exit game if escape key is pressed
                     return True
             if self.state.name == GameState.BOARD:
-                if event.type == pygame.MOUSEBUTTONUP and event.button == 1 and pygame.mouse.get_pos()[0] > 1300:
-                    self.score_board.edit_score(self.player_manager)
-                    return False
+                if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+                    if pygame.mouse.get_pos()[0] > 1300:
+                        self.score_board.edit_score(self.player_manager)
+                        return False
                 self.score_board.update_score(event, self.player_manager)
             # pass along event to be handled by current state
             self.state.handle_event(event)
@@ -84,7 +85,7 @@ class Game():
 
     def draw(self):
         """Draws the current frame to the screen."""
-        if self.state.name in (GameState.STATS, GameState.OPTIONS, GameState.TITLE, GameState.LOADING, GameState.INTRO, GameState.HALL):
+        if not self.state.show_score:
             self.state.draw(self.screen)
         else:
             # draw score board

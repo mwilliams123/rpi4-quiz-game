@@ -1,10 +1,11 @@
 """
 Implement Daily Double
 """
-from constants import GameState, Colors
-from util import TTS, SoundEffects, display_text, Font
-from state import InputState
 import time
+from util.constants import GameState, Colors
+from util.util import TTS, SoundEffects, display_text, Font
+from states.state import InputState
+
 class DailyDouble(InputState):
     """Handles the implementation of Daily Double questions.
 
@@ -24,13 +25,21 @@ class DailyDouble(InputState):
         self.timer = 6000
         self.show_answer = False
 
-    def startup(self, store, player_manager):
+    def startup(self, store, _player_manager):
         SoundEffects.play(2) # daily double sound
         self.store = store
         self.clicked = False
         self.wager = None
         self.timer = 6000
         self.show_answer = False
+
+    def countdown(self, elapsed_time):
+        """Wait for player to answer."""
+        self.timer -= elapsed_time
+        if self.timer <= 0:
+            SoundEffects.play(1) # time's up
+            if self.store['host'] is None:
+                self.show_answer = True
 
     def update(self, player_manager, elapsed_time):
         """Checks if the user has made a wager, reads the question, and counts down the time a
@@ -69,14 +78,10 @@ class DailyDouble(InputState):
             else:
                 # Count down time left to answer
                 if self.timer > 0:
-                    self.timer -= elapsed_time
-                    if self.timer <= 0:
-                        SoundEffects.play(1) # time's up
-                        if host is None:
-                            self.show_answer = True
+                    self.countdown(elapsed_time)
                 if host is not None:
                     resp = host.poll()
-                    if resp == "True" or resp == "False":
+                    if resp in ["True", "False"]:
                         correct = resp == "True"
                         player = player_manager.players[player_manager.control]
                         player.answer_question(correct, self.wager)

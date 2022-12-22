@@ -4,7 +4,7 @@ for other classes to access/update player score and status.
 """
 from types import SimpleNamespace
 import gpiozero
-from player import Player
+from player.player import Player
 buzzer_pins = [6,21,17, 22, 26]
 led_pins = [19, 16, 12, 27, 13]
 class PlayerManager():
@@ -33,12 +33,13 @@ class PlayerManager():
         self.triple_stumpers = 0
 
     def initialize_players(self, num_players):
-        # Player(19, 6, 0, self), Player(16, 21, 1, self), Player(12, 17, 2, self)
+        """Add players to game based on number specified in settings."""
         for i in range(num_players):
             player = Player(led_pins[i], buzzer_pins[i], i, self)
             self.players.append(player)
 
     def zero_scores(self):
+        """Reset player scores to zero."""
         for player in self.players:
             player.score = 0
 
@@ -158,9 +159,11 @@ class PlayerManager():
         return sorted(players, key=lambda p: p.score)
 
     def log_clue(self):
+        """Record when new question starts."""
         for player in self.players:
             player.stats.record_clue()
 
     def log_question_stats(self):
+        """Record stats about question attempts."""
         for player in self.players:
             player.stats.record_questions_stats()

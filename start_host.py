@@ -5,42 +5,38 @@ import socket
 import select
 import time
 import pygame
-from host_screen import Host
-from util import Font
+from host.screen import Host
+from host.socket_util import get_lan
+from util.util import Font
 
 def main():
-    # get LAN address
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    s.connect(("8.8.8.8", 80))
-    lan = s.getsockname()[0] #"192.168.1.31"
-    s.close()
-    print(lan)
-
+    """Launch host program."""
     pygame.init()
     Font.load_fonts()
     host = Host()
     host.startup()
+    lan = get_lan()
     quit_pressed = False
     screen = pygame.display.set_mode((1300,700))
     while True:
         try:
             print("Trying to connect...")
             # connect to server
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.connect((lan, 8080))
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.connect((lan, 8080))
             break
         except ConnectionRefusedError:
             time.sleep(1)
 
     poller = select.poll()
-    poller.register(s, select.POLLIN)
+    poller.register(sock, select.POLLIN)
     print("Connected to server")
     clock = pygame.time.Clock()
     text = ''
     while not quit_pressed:
         events = poller.poll(10)
         if len(events) > 0:
-            msg = s.recv(512).decode()
+            msg = sock.recv(512).decode()
             print(msg)
             if msg == 'continue':
                 host.timer_expired = True
@@ -54,7 +50,7 @@ def main():
         host.draw(screen, text)
         if host.update():
             # button was clicked, send back
-            s.send(str(host.correct).encode())
+            sock.send(str(host.correct).encode())
             if host.correct or host.timer_expired:
                 # reset
                 host.startup()
@@ -63,7 +59,7 @@ def main():
         pygame.display.flip()
         clock.tick(40)
 
-    s.close()
+    sock.close()
 
 
 if __name__ == "__main__":

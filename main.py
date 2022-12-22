@@ -4,20 +4,20 @@
     $ python main.py
 """
 import pygame
-from board import Board
-from categories import IntroScreen
-from daily_double import DailyDouble
-from final import Final
 from game import Game
-from constants import GameState
-from hall_of_fame import Hall
-from loading import LoadingScreen
-from question import Question
-from stats import Stats
-from tie_breaker import TieBreaker
-from title import TitleScreen
-from util import Font, SoundEffects
-from options import OptionsScreen
+from states.board import Board
+from states.categories import IntroScreen
+from states.daily_double import DailyDouble
+from states.final import Final
+from states.hall_of_fame import Hall
+from states.loading import LoadingScreen
+from states.options import OptionsScreen
+from states.question import Question
+from states.stats import Stats
+from states.tie_breaker import TieBreaker
+from states.title import TitleScreen
+from util.util import Font, SoundEffects
+from util.constants import GameState
 
 def main():
     """Initializes pygame display, loads resources, & launches game."""

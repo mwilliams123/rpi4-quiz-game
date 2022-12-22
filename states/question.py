@@ -2,15 +2,13 @@
 Show question on screen and get player response
 """
 from collections import namedtuple
-import requests
-import pygame
-import threading
-from constants import Colors, GameState
-from util import SoundEffects, display_text, Button, TTS, Font
-from state import State
+from util.constants import Colors, GameState
+from util.util import SoundEffects, display_text, Button, TTS, Font
+from states.state import State
 
-class TieBreaker(State):
-    """Tie breaking round when scores are equal. First to ring in and guess correctly wins.
+class Question(State):
+    """Game state that handles presenting clues, waiting for players to ring in,
+    and determining correctness of answers.
 
     Attributes:
         name (GameState): Enum that represents this game state
@@ -24,18 +22,13 @@ class TieBreaker(State):
         """
     def __init__(self):
         super().__init__()
-        self.name = GameState.TIE
+        self.name = GameState.QUESTION
         self.show_answer = False
         self.rang_in = False
-        self.clicked = False
         ButtonList = namedtuple('ButtonsList',['continue_button', 'correct_button', 'wrong_button'])
         self.buttons = ButtonList(Button('Continue'), Button('Correct'), Button('Incorrect'))
         self.timer = 5000
-        self.question = None
-        self.thread = None
-        self.winner = None
-        self.loading = False
-        self.show_category = True
+        self.show_score = True
 
     def startup(self, store, player_manager):
         """Reads the question out loud and resets the timer.
@@ -43,44 +36,36 @@ class TieBreaker(State):
         Args:
             store (dict of str: Any): Dictionary of persistent data passed from state to state
         """
-        # fetch a clue
+        TTS.play_speech(store['clue']['answer'])
         self.store = store
         self.clicked = False
-        self.tiebreaker(player_manager)
-
-    def tiebreaker(self, player_manager):
         self.show_answer = False
         self.rang_in = False
         self.timer = 5000
-        player_manager.reset()
-        self.question = None
-        self.show_category = True
-        self.thread = threading.Thread(target=self.load_question)
-        self.loading = True
-        self.thread.start()
-
-    def load_question(self):
-        data = requests.get('http://mathnerd7.pythonanywhere.com/one')
-        self.question = data.json()
-        self.loading = False
-
-    def play_question(self):
-        TTS.play_speech(self.question['answer'])
         host = self.store['host']
+        player_manager.reset()
+        player_manager.log_clue()
         if host is not None:
             # send answer to host
-            host.send("answer: " + self.question['question'])
+            host.send("answer: " + store['clue']['question'])
 
-    def handle_event(self, event):
-        """
-        Sets flag when left mouse is clicked.
-
-        Args:
-            event (Event): Pygame Event such as a mouse click or keyboard press.
-        """
-        if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-            self.clicked = True
-
+    def wait_for_continue(self, player_manager):
+        """Check if buttons have been clicked to return to board."""
+        if not self.rang_in:
+            # continue button if no one rings in
+            if self.clicked and self.buttons.continue_button.was_clicked():
+                return GameState.BOARD
+        elif self.clicked:
+            # Correct/incorrect button to indicate if player who rung in answered correctly
+            if self.buttons.correct_button.was_clicked():
+                player_manager.log_question_stats()
+                player_manager.update(True,self.store['clue']['value'])
+                return GameState.BOARD
+            if self.buttons.wrong_button.was_clicked():
+                player_manager.log_question_stats()
+                player_manager.update(False,self.store['clue']['value'])
+                return GameState.BOARD
+        return None
     def update(self, player_manager, elapsed_time):
         """Checks if players have rung in or time has expired for the question to be answered.
         Waits for user to click a button to return to board.
@@ -94,32 +79,17 @@ class TieBreaker(State):
                 no one rung in. Continues to return QUESTION otherwise.
         """
         host = self.store['host']
-        if TTS.is_busy() or self.loading:
+        if TTS.is_busy():
             # question is still being read
-            return GameState.TIE
-        if not player_manager.green and not self.show_category:
+            return GameState.QUESTION
+        if not player_manager.green:
             # turn on light to let players know to ring in
-            player_manager.green_light(eligible=self.store['candidates'])
-        if self.winner is not None:
-            if self.clicked and self.buttons.continue_button.was_clicked():
-                return GameState.HALL
-        if self.show_category:
-            if self.clicked and self.buttons.continue_button.was_clicked:
-                self.play_question()
-                self.show_category = False
-        elif self.show_answer:
-            # Check if buttons have been clicked to return to board
-            if player_manager.rung_in is None:
-                # continue button if no one rings in
-                if self.clicked and self.buttons.continue_button.was_clicked():
-                    # reload
-                    self.tiebreaker(player_manager)
-            elif self.clicked:
-                # Correct/incorrect button to indicate if player who rung in answered correctly
-                if self.buttons.correct_button.was_clicked():
-                    self.winner = player_manager.rung_in
-                if self.buttons.wrong_button.was_clicked():
-                    self.tiebreaker(player_manager)
+            player_manager.green_light()
+
+        if self.show_answer:
+            next_state = self.wait_for_continue(player_manager)
+            if next_state is not None:
+                return next_state
         else:
             if player_manager.rung_in is None:
                 # Decrement timer while waiting for players to ring in
@@ -133,10 +103,13 @@ class TieBreaker(State):
                             host.send("continue")
                             host.wait = True
                         # wait for host to continue
-                        if host.poll():
-                            self.tiebreaker(player_manager)
+                        resp = host.poll()
+                        if resp:
+                            player_manager.triple_stumpers += 1
+                            player_manager.log_question_stats()
+                            return GameState.BOARD
                     else:
-                        player_manager.reset()
+                        player_manager.triple_stumpers += 1
                         SoundEffects.play(1) # time's up
                         self.show_answer = True
             else:
@@ -149,12 +122,16 @@ class TieBreaker(State):
                 if host is not None:
                     resp = host.poll()
                     if resp == "True":
-                        self.winner = player_manager.rung_in
-                        return GameState.TIE
+                        player_manager.log_question_stats()
+                        player_manager.reset()
+                        player_manager.update(True,self.store['clue']['value'])
+                        return GameState.BOARD
                     if resp == "False":
                         self.timer = 5000
                         player_manager.second_chance()
-                        return GameState.TIE
+                        player_manager.update(False,self.store['clue']['value'])
+                        self.rang_in = False
+                        return GameState.QUESTION
 
                 if player_manager.timer > 0:
                     if player_manager.poll(elapsed_time):
@@ -163,9 +140,9 @@ class TieBreaker(State):
                             self.show_answer = True
                         else:
                             SoundEffects.play(1) # time's up
-       
+
         self.clicked = False # reset flag
-        return GameState.TIE
+        return GameState.QUESTION
 
     def draw(self, screen):
         """
@@ -178,36 +155,18 @@ class TieBreaker(State):
         screen.fill(Colors.BLUE)
 
         width, height = screen.get_size()
-        if self.question is None:
-            # loading
-            display_text(screen, 'Loading...', Font.button, (100, 100, width-100, height-100))
-        elif self.show_answer:
+        if self.show_answer:
             # draw answer
-            text = self.question['question']
+            text = self.store['clue']['question']
+            display_text(screen, text.upper(), Font.clue, (100, 100, width-100, height-100))
             if self.rang_in:
-                if self.winner is not None:
-                    text = "Player " + str(self.winner + 1) + " wins!"
-                    display_text(screen, text, Font.number, (100, 100, width-100, height-100))
-                    self.buttons.continue_button.draw(screen, (width/2, height*3/4))
-                    return
-                else:
-                    # draw correct/incorrect buttons
-                    self.buttons.correct_button.draw(screen, (width*1/4, height*3/4))
-                    self.buttons.wrong_button.draw(screen, (width*3/4, height*3/4))
+                # draw correct/incorrect buttons
+                self.buttons.correct_button.draw(screen, (width*1/4, height*3/4))
+                self.buttons.wrong_button.draw(screen, (width*3/4, height*3/4))
             else:
                 # draw continue button
                 self.buttons.continue_button.draw(screen, (width*1/2, height*3/4))
-            display_text(screen, text.upper(), Font.clue, (100, 100, width-100, height-100))
-            
-        elif self.show_category:
-            # display category
-            text = self.question['category']
-            cat_rect = Font.number.render(text, True, Colors.WHITE)
-            rect = cat_rect.get_rect(center = (width*1/2, height/2))
-            screen.blit(cat_rect, rect)
-            self.buttons.continue_button.draw(screen, (width*1/2, height*3/4))
         else:
             # draw question
-            text = self.question['answer']
+            text = self.store['clue']['answer']
             display_text(screen, text.upper(), Font.clue, (100, 100, width-100, height-100))
-

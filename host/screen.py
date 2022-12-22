@@ -1,10 +1,10 @@
 """
-Show answer on screen and let host indicate if answered correctly
+Screen for human host to view answers and indicate if player answered correctly.
 """
 from collections import namedtuple
 import pygame
-from constants import Colors
-from util import display_text, Button,  Font
+from util.constants import Colors
+from util.util import display_text, Button,  Font
 
 class Host():
     """Game state that handles presenting clues, waiting for players to ring in,

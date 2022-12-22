@@ -6,7 +6,7 @@ from gpiozero import Button, LED, Device
 from gpiozero.pins.mock import MockFactory
 from gpiozero.exc import BadPinFactory
 
-from player_stats import PlayerStats
+from player.player_stats import PlayerStats
 
 class Player:
     """Representation of a player and associated hardware in the game.

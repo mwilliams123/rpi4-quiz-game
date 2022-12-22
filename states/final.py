@@ -2,9 +2,9 @@
 Implement final jeopardy
 """
 
-from constants import Colors, GameState
-from util import Button, SoundEffects, display_text, TTS, Font
-from state import InputState
+from util.constants import Colors, GameState
+from util.util import Button, SoundEffects, display_text, TTS, Font
+from states.state import InputState
 
 class Final(InputState):
     """Handles the implementation of Final Jeopardy.
@@ -32,6 +32,20 @@ class Final(InputState):
         self.players_left = []
         self.return_button = Button('Continue')
 
+    def play_final(self, player_manager):
+        """Play final jeopardy theme."""
+        if not TTS.is_busy() and self.play_sound:
+            # Wait for question to finish being read, then play final theme
+            SoundEffects.play(3)
+            self.play_sound = False
+        elif not SoundEffects.is_busy():
+            # When final theme finishes, show the answer
+            host = self.store['host']
+            if host is not None:
+                host.send("Answer: " + self.store['data']['fj']['question'])
+            self.show_answer = True
+            self.players_left = player_manager.sort_players()
+
     def update(self, player_manager, elapsed_time):
         """Checks if players have entered wagers, reads question, and plays final theme.
 
@@ -42,7 +56,6 @@ class Final(InputState):
         Returns:
             GameState: FINAL game state
         """
-        host = self.store['host']
         clue = self.store['data']['fj']
         if self.wait_for_wagers:
             # Wait until continue is clicked, then present question
@@ -51,16 +64,8 @@ class Final(InputState):
                 TTS.play_speech(clue['answer'])
                 self.play_sound = True
         elif not self.show_answer:
-            if not TTS.is_busy() and self.play_sound:
-                # Wait for question to finish being read, then play final theme
-                SoundEffects.play(3)
-                self.play_sound = False
-            elif not SoundEffects.is_busy():
-                # When final theme finishes, show the answer
-                if host is not None:
-                    host.send("Answer: " + clue['question'])
-                self.show_answer = True
-                self.players_left = player_manager.sort_players()
+            self.play_final(player_manager)
+
         if self.show_answer and self.winner is None:
             if len(self.players_left) > 0:
                 player = self.players_left[0]
@@ -76,7 +81,7 @@ class Final(InputState):
                     # tie breaker
                     self.store['candidates'] = candidates
                     return GameState.TIE
-            
+
         if self.winner is not None:
             if self.clicked and self.return_button.was_clicked():
                 return GameState.HALL

@@ -6,7 +6,7 @@ import pygame
 from pydub import AudioSegment
 from pygame import mixer
 from gtts import gTTS
-from constants import Colors
+from util.constants import Colors
 
 class Font():
     """Fonts for rendered text.
@@ -54,10 +54,12 @@ class Font():
 
     @classmethod
     def get_smaller(cls, font):
+        """Retrieve a smaller version of font."""
         if font == cls.get_font(cls.CLUE):
             return cls.get_font(cls.CLUE_SMALL)
         if font == cls.get_font(cls.CLUE_SMALL):
             return cls.get_font(cls.CLUE_SMALLEST)
+        return cls.get_font(font)
 
     @classmethod
     @property
@@ -150,9 +152,10 @@ class Button():
         screen.blit(self.text, self.rect)
 
     def set_text(self, text):
+        """Change the text on a button."""
         self.text = Font.button.render(text, True, Colors.WHITE)
 
-def display_text(screen, text, font, rect):
+def display_text(screen, text, font, rect, offset=2):
     """Displays text with shadow.
 
     Args:
@@ -162,8 +165,8 @@ def display_text(screen, text, font, rect):
         rect (int, int, int, int): Bounds (left, top, right, bottom) of the rectangle to draw
             the text within. Bounds are pixel values relative to screen.
     """
-    offset = 2
-    draw_text(screen, text, font, (rect[0]+offset, rect[1]+offset, rect[2]+offset, rect[3]+offset), Colors.BLACK)
+    shadow_rect = (rect[0]+offset, rect[1]+offset, rect[2]+offset, rect[3]+offset)
+    draw_text(screen, text, font, shadow_rect , Colors.BLACK)
     draw_text(screen, text, font, rect, Colors.WHITE)
 
 def draw_text(screen, text, font, rect, color):
@@ -178,7 +181,6 @@ def draw_text(screen, text, font, rect, color):
     """
     words = text.split(' ') # list of words
     rects = [] # list of rectangles, where each box contains one line
-    height = 0 # total height of all lines
     i = 0
     while i < len(words):
         # Add word to new line
@@ -195,15 +197,14 @@ def draw_text(screen, text, font, rect, color):
             i += 1
         # render line to a rectangular surface
         rects.append(font.render(line, True, color))
-        height += line_height
 
-    if height > screen.get_size()[1] and Font.get_smaller(font):
+    if line_height*len(rects) > screen.get_size()[1] and Font.get_smaller(font):
         # try again with a smaller font
         draw_text(screen, text, Font.get_smaller(font), rect, color)
         return
 
     # draw text rectangles
-    y_pos = (rect[1] + rect[3])/2 - height/2 + line_height/2 # center vertically
+    y_pos = (rect[1] + rect[3])/2 - line_height*len(rects)/2 + line_height/2 # center vertically
     x_pos = (rect[0] + rect[2]) // 2 # center horizontally
     for text_rect in rects:
         screen.blit(text_rect, text_rect.get_rect(center=(x_pos, y_pos)))
@@ -216,10 +217,10 @@ class TTS():
 
     @classmethod
     def prepare_speech(cls, text):
-        """Prepares text to be read aloud. 
+        """Prepares text to be read aloud.
 
         Args:
-            text (string): raw text from clue database 
+            text (string): raw text from clue database
 
         Returns:
             string: cleaned text

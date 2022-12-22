@@ -11,7 +11,8 @@ handles user input such as mouse clicks and keyboard presses.
 """
 from collections import namedtuple
 import pygame
-from util import Button
+from util.util import Button
+
 class State():
     """
     Abstract class for game states.
@@ -22,8 +23,10 @@ class State():
     """
     def __init__(self):
         self.store = {}
+        self.show_score = False
+        self.clicked = False
 
-    def startup(self, store, player_manager):
+    def startup(self, store, _player_manager):
         """
         Executes once immediately after a state is transitioned into.
 
@@ -39,6 +42,8 @@ class State():
         Args:
             event (Event): Pygame Event such as a mouse click or keyboard press.
         """
+        if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+            self.clicked = True
 
     def update(self, player_manager, elapsed_time):
         """Handles game logic.
@@ -74,11 +79,11 @@ class InputState(State):
     """
     def __init__(self):
         super().__init__()
-        self.clicked = False
         self.input = ''
         ButtonList = namedtuple('ButtonsList',['continue_button', 'correct_button', 'wrong_button'])
         self.buttons = ButtonList(Button('Continue'), Button('Correct'), Button('Incorrect'))
         self.correct = False
+        self.show_score = True
 
     def handle_event(self, event):
         """

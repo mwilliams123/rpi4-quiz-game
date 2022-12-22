@@ -2,21 +2,21 @@
 Util functions for score display.
 """
 import pygame
-from constants import Colors
-from util import Font
+from util.constants import Colors
+from util.util import Font
 
 class Score:
-    """_summary_
-    """
+    """Display player scores and question timers."""
 
     def __init__(self) -> None:
         self.score_boxes = []
         self.clicked = False
         self.editing = None
         self.edit_text = ''
+        self.screen = pygame.Surface((300, 1000))
 
     def make_score_boxes(self, num_players):
-        self.screen = pygame.Surface((300, 1000))
+        """Generate surfaces where scores will be drawn."""
         width, height = self.screen.get_size()
         box_height = height / num_players
         for i in range(num_players):
@@ -26,7 +26,7 @@ class Score:
         """Set score box to be edited."""
         y_pos = pygame.mouse.get_pos()[1]
         for i,box in enumerate(self.score_boxes):
-            if y_pos >= box[1] and y_pos < box[1] + box[3]:
+            if box[1] <= y_pos < box[1] + box[3]:
                 # update score
                 self.editing = i
                 self.edit_text = str(player_manager.players[i].score)
@@ -74,14 +74,16 @@ class Score:
                 active = True
             else:
                 score = player.score
-            draw_score(self.screen, rect, i, score, player_manager.timer, active)
+            draw_score(self.screen, rect, i, score)
+            draw_timer(self.screen, rect, player_manager.timer, active)
             if active:
                 # draw white outline
-                pygame.draw.rect(self.screen, Colors.WHITE, (5, rect[1]+5, rect[2]-10, rect[3]-10), 10)
+                outline = (5, rect[1]+5, rect[2]-10, rect[3]-10)
+                pygame.draw.rect(self.screen, Colors.WHITE, outline, 10)
             # draw box outline
             pygame.draw.rect(self.screen, Colors.BLACK, rect, 5)
 
-def draw_score(screen, rect, player_number, score, timer, active):
+def draw_score(screen, rect, player_number, score):
     """Draws score and timer display for one player.
 
     Args:
@@ -101,7 +103,8 @@ def draw_score(screen, rect, player_number, score, timer, active):
     text_rect = text.get_rect(center=((rect[0] + rect[2])/2, rect[1] + rect[3]/4))
     screen.blit(text,text_rect)
 
-    # Draw timer display - 9 rectangles colored red or black to indicate time remaining
+def draw_timer(screen, rect, active, timer):
+    """Draw timer display to indicate time remaining."""
     little_rect_width = rect[2]/9
     for i in range(9):
         color = Colors.BLACK
