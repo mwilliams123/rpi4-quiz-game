@@ -17,23 +17,6 @@ class OptionsScreen(State):
         self.back = Button("Back")
         self.hosted_toggle = Button("OFF")
         self.num_players_toggle = Button("3")
-        self.store = {}
-        self.initialize_store()
-
-    def startup(self, store, _player_manager):
-        """
-        Executes once immediately after a state is transitioned into.
-
-        Args:
-            store (dict of str: Any): Dictionary of persistent data passed from state to state
-        """
-        self.store = {}
-        self.initialize_store()
-
-    def initialize_store(self):
-        """Assign default values for game options."""
-        self.store['hosted'] = False
-        self.store['n_players'] = 3
 
     def update(self, player_manager, elapsed_time):
         """
