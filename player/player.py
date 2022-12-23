@@ -2,12 +2,8 @@
 Manages player score, buzzer, and timers
 """
 import threading
-from gpiozero import Button, LED, Device
-from gpiozero.pins.mock import MockFactory
-from gpiozero.exc import BadPinFactory
-
 from player.player_stats import PlayerStats
-
+from player.buzzer import Buzzer
 class Player:
     """Representation of a player and associated hardware in the game.
 
@@ -33,15 +29,7 @@ class Player:
         self.manager = manager
         self.locked_out = False
         self.stats = PlayerStats()
-        try:
-            self.buzzer = Button(buzzer_pin)
-            self.led = LED(led_pin)
-        except BadPinFactory:
-            # Use mock hardware when not running on RPi
-            Device.pin_factory = MockFactory()
-            self.buzzer = Button(buzzer_pin)
-            self.led = LED(led_pin)
-        self.buzzer.when_pressed = self.buzz_in
+        self.buzzer = Buzzer(led_pin, buzzer_pin, self.buzz_in)
 
     def buzz_in(self):
         """Called when player presses their button.
@@ -53,7 +41,7 @@ class Player:
             # Player rung in successfully
             self.manager.ring_in(self.number)
             self.stats.record_answer()
-            self.led.on()
+            self.buzzer.light_up()
         elif not self.locked_out:
             # Player rung in too early, lock them out
             self.locked_out = True

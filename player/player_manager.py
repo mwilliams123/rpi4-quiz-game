@@ -63,7 +63,7 @@ class PlayerManager():
         self.green = False
         for player in self.players:
             player.eligible = False
-            player.led.off()
+            player.buzzer.light_off()
 
     def poll(self, elapsed_time):
         """Counts down player timer and checks to see if time has expired.
