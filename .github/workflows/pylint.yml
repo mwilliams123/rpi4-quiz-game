@@ -23,12 +23,8 @@ jobs:
       id: score
       run: |
         echo "##[set-output name=data;]$(pylint --extension-pkg-whitelist=pygame $(git ls-files '*.py') | tee log.txt | sed -n 's/^Your code has been rated at \([-0-9.]*\)\/.*/\1/p')"
-    - uses: actions/upload-artifact@v3
-      with:
-        name: pylintlog
-        path: log.txt 
-    - name: Save output
-      run: pylint --extension-pkg-whitelist=pygame $(git ls-files '*.py') >> $GITHUB_STEP_SUMMARY
+    - name: Save summary
+      run: cat log.txt >> $GITHUB_STEP_SUMMARY
     - name: Badge
       uses: RubbaBoy/BYOB@v1.3.0
       with:
