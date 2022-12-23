@@ -42,7 +42,7 @@ class LoadingScreen(State):
 
     def fetch(self):
         """Fetches questions from the API and formats them into rounds."""
-        data = requests.get('http://mathnerd7.pythonanywhere.com/api')
+        data = requests.get('http://mathnerd7.pythonanywhere.com/api', timeout=120)
         data_json = data.json()
         self.load_round(data_json['clues'][0], 0)
         self.load_round(data_json['clues'][1], 1) # double jeopardy round

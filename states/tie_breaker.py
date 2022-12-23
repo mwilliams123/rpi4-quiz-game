@@ -46,7 +46,7 @@ class TieBreaker(QuestionState):
 
     def load_question(self):
         """Fetch a tiebreaker question."""
-        data = requests.get('http://mathnerd7.pythonanywhere.com/one')
+        data = requests.get('http://mathnerd7.pythonanywhere.com/one',  timeout=60)
         self.question = data.json()
 
     def play_question(self):
