@@ -22,7 +22,11 @@ jobs:
     - name: Analysing the code with pylint
       id: score
       run: |
-        echo "##[set-output name=data;]$(pylint --extension-pkg-whitelist=pygame $(git ls-files '*.py') | sed -n 's/^Your code has been rated at \([-0-9.]*\)\/.*/\1/p')"
+        echo "##[set-output name=data;]$(pylint --extension-pkg-whitelist=pygame $(git ls-files '*.py') | tee log.txt | sed -n 's/^Your code has been rated at \([-0-9.]*\)\/.*/\1/p')"
+    - uses: actions/upload-artifact@v3
+      with:
+        name: pylintlog
+        path: log.txt 
     - name: Badge
       uses: RubbaBoy/BYOB@v1.3.0
       with:
