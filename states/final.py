@@ -3,7 +3,7 @@ Implement final jeopardy
 """
 
 from util.constants import Colors, GameState
-from util.util import Button, SoundEffects, display_text, TTS, Font
+from util.util import SoundEffects, display_text, TTS, Font
 from states.state import InputState
 
 class Final(InputState):
@@ -28,7 +28,6 @@ class Final(InputState):
         self.play_sound = False
         self.winner = None
         self.players_left = []
-        self.return_button = Button('Continue')
 
     def play_final(self, player_manager):
         """Play final jeopardy theme."""
@@ -81,7 +80,7 @@ class Final(InputState):
                     return GameState.TIE
 
         if self.winner is not None:
-            if self.clicked and self.return_button.was_clicked():
+            if self.clicked and self.buttons.continue_button.was_clicked():
                 return GameState.HALL
         self.clicked = False
         return GameState.FINAL
@@ -120,7 +119,7 @@ class Final(InputState):
                 if self.winner is not None:
                     text = "Player " + str(self.winner.number + 1) + " wins!"
                     display_text(screen, text, Font.number, (100, 100, width-100, height-100))
-                    self.return_button.draw(screen, (width/2, height*3/4))
+                    self.buttons.continue_button.draw(screen, (width/2, height*3/4))
                 else:
                     # draw answer
                     if self.store['host'] is None:
@@ -130,9 +129,7 @@ class Final(InputState):
                     text = "Player " + str(player + 1) + " wager:"
                     display_text(screen, text, Font.number, (100, height/3, width-100, height/2))
                     # draw wagered amount
-                    text = Font.number.render('$' + self.input, True, Colors.WHITE)
-                    rect = text.get_rect(center=(width/2, height*3/5))
-                    screen.blit(text,rect)
+                    self.draw_input(screen)
                     # draw correct/incorrect buttons
                     self.draw_buttons(screen)
             else:
