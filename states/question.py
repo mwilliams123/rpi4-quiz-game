@@ -1,12 +1,11 @@
 """
 Show question on screen and get player response
 """
-from collections import namedtuple
 from util.constants import Colors, GameState
-from util.util import SoundEffects, display_text, Button, TTS, Font
-from states.state import State
+from util.util import SoundEffects, display_text, TTS, Font
+from states.state import QuestionState
 
-class Question(State):
+class Question(QuestionState):
     """Game state that handles presenting clues, waiting for players to ring in,
     and determining correctness of answers.
 
@@ -19,15 +18,6 @@ class Question(State):
             if no one rung in.
         timer (int): Milliseconds left for players to ring in
         """
-    def __init__(self):
-        super().__init__()
-        self.name = GameState.QUESTION
-        self.show_answer = False
-        self.rang_in = False
-        ButtonList = namedtuple('ButtonsList',['continue_button', 'correct_button', 'wrong_button'])
-        self.buttons = ButtonList(Button('Continue'), Button('Correct'), Button('Incorrect'))
-        self.timer = 5000
-        self.show_score = True
 
     def startup(self, store, player_manager):
         """Reads the question out loud and resets the timer.
@@ -37,13 +27,9 @@ class Question(State):
         """
         TTS.play_speech(store['clue']['answer'])
         self.store = store
-        self.clicked = False
-        self.show_answer = False
-        self.rang_in = False
-        self.timer = 5000
-        host = self.store['host']
-        player_manager.reset()
+        self.reset(player_manager)
         player_manager.log_clue()
+        host = self.store['host']
         if host is not None:
             # send answer to host
             host.send("answer: " + store['clue']['question'])
@@ -64,6 +50,23 @@ class Question(State):
                 player_manager.log_question_stats()
                 player_manager.update(False,self.store['clue']['value'])
                 return GameState.BOARD
+        return None
+
+    def poll_host(self, player_manager):
+        """Wait for host to say if player answered correctly."""
+        host = self.store['host']
+        resp = host.poll()
+        if resp == "True":
+            player_manager.log_question_stats()
+            player_manager.reset()
+            player_manager.update(True,self.store['clue']['value'])
+            return GameState.BOARD
+        if resp == "False":
+            self.timer = 5000
+            player_manager.second_chance()
+            player_manager.update(False,self.store['clue']['value'])
+            self.rang_in = False
+            return GameState.QUESTION
         return None
     def update(self, player_manager, elapsed_time):
         """Checks if players have rung in or time has expired for the question to be answered.
@@ -96,14 +99,7 @@ class Question(State):
                 if self.timer <= 0:
                     # no one rung in
                     if host is not None:
-                        if not host.wait:
-                            player_manager.reset()
-                            SoundEffects.play(1) # time's up
-                            host.send("continue")
-                            host.wait = True
-                        # wait for host to continue
-                        resp = host.poll()
-                        if resp:
+                        if self.wait_for_host(player_manager):
                             player_manager.triple_stumpers += 1
                             player_manager.log_question_stats()
                             return GameState.BOARD
@@ -113,32 +109,12 @@ class Question(State):
                         self.show_answer = True
             else:
                 # player rang in, wait for response
-                if not self.rang_in:
-                    if host is not None:
-                        host.send("rangin")
-                    self.rang_in = True
+                self.wait_for_response(player_manager, elapsed_time)
 
                 if host is not None:
-                    resp = host.poll()
-                    if resp == "True":
-                        player_manager.log_question_stats()
-                        player_manager.reset()
-                        player_manager.update(True,self.store['clue']['value'])
-                        return GameState.BOARD
-                    if resp == "False":
-                        self.timer = 5000
-                        player_manager.second_chance()
-                        player_manager.update(False,self.store['clue']['value'])
-                        self.rang_in = False
-                        return GameState.QUESTION
-
-                if player_manager.timer > 0:
-                    if player_manager.poll(elapsed_time):
-                        # out of time
-                        if host is None:
-                            self.show_answer = True
-                        else:
-                            SoundEffects.play(1) # time's up
+                    game_state = self.poll_host(player_manager)
+                    if game_state is not None:
+                        return game_state
 
         self.clicked = False # reset flag
         return GameState.QUESTION
@@ -158,13 +134,7 @@ class Question(State):
             # draw answer
             text = self.store['clue']['question']
             display_text(screen, text.upper(), Font.clue, (100, 100, width-100, height-100))
-            if self.rang_in:
-                # draw correct/incorrect buttons
-                self.buttons.correct_button.draw(screen, (width*1/4, height*3/4))
-                self.buttons.wrong_button.draw(screen, (width*3/4, height*3/4))
-            else:
-                # draw continue button
-                self.buttons.continue_button.draw(screen, (width*1/2, height*3/4))
+            self.draw_buttons(self.rang_in)
         else:
             # draw question
             text = self.store['clue']['answer']

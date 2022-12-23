@@ -1,14 +1,13 @@
 """
 Show question on screen and get player response
 """
-from collections import namedtuple
 import threading
 import requests
 from util.constants import Colors, GameState
-from util.util import SoundEffects, display_text, Button, TTS, Font
-from states.state import State
+from util.util import SoundEffects, display_text, TTS, Font
+from states.state import QuestionState
 
-class TieBreaker(State):
+class TieBreaker(QuestionState):
     """Tie breaking round when scores are equal. First to ring in and guess correctly wins.
 
     Attributes:
@@ -22,18 +21,10 @@ class TieBreaker(State):
         """
     def __init__(self):
         super().__init__()
-        self.name = GameState.TIE
-        self.show_answer = False
-        self.rang_in = False
-        ButtonList = namedtuple('ButtonsList',['continue_button', 'correct_button', 'wrong_button'])
-        self.buttons = ButtonList(Button('Continue'), Button('Correct'), Button('Incorrect'))
-        self.timer = 5000
         self.question = None
         self.thread = None
         self.winner = None
-        self.loading = False
         self.show_category = True
-        self.show_score = True
 
     def startup(self, store, player_manager):
         """Reads the question out loud and resets the timer.
@@ -42,27 +33,21 @@ class TieBreaker(State):
             store (dict of str: Any): Dictionary of persistent data passed from state to state
         """
         # fetch a clue
-        self.store = store
-        self.clicked = False
+        super().startup(store, player_manager)
         self.tiebreaker(player_manager)
 
     def tiebreaker(self, player_manager):
         """Load new question and reset player eligibility to ring in."""
-        self.show_answer = False
-        self.rang_in = False
-        self.timer = 5000
-        player_manager.reset()
+        self.reset(player_manager)
         self.question = None
         self.show_category = True
         self.thread = threading.Thread(target=self.load_question)
-        self.loading = True
         self.thread.start()
 
     def load_question(self):
         """Fetch a tiebreaker question."""
         data = requests.get('http://mathnerd7.pythonanywhere.com/one')
         self.question = data.json()
-        self.loading = False
 
     def play_question(self):
         """Read question aloud."""
@@ -93,33 +78,12 @@ class TieBreaker(State):
             # no one rung in
             host = self.store['host']
             if host is not None:
-                if not host.wait:
-                    player_manager.reset()
-                    SoundEffects.play(1) # time's up
-                    host.send("continue")
-                    host.wait = True
-                # wait for host to continue
-                if host.poll():
+                if self.wait_for_host(player_manager):
                     self.tiebreaker(player_manager)
             else:
                 player_manager.reset()
                 SoundEffects.play(1) # time's up
                 self.show_answer = True
-    def wait_for_response(self, player_manager, elapsed_time):
-        """Wait for response from player who range in."""
-        host = self.store['host']
-        if not self.rang_in:
-            if host is not None:
-                host.send("rangin")
-            self.rang_in = True
-
-        if player_manager.timer > 0:
-            if player_manager.poll(elapsed_time):
-                # out of time
-                if host is None:
-                    self.show_answer = True
-                else:
-                    SoundEffects.play(1) # time's up
 
     def update(self, player_manager, elapsed_time):
         """Checks if players have rung in or time has expired for the question to be answered.
@@ -133,7 +97,7 @@ class TieBreaker(State):
             (GameState): End of game HALL state if question has been answered correctly.
                 Continues to return TIE otherwise.
         """
-        if TTS.is_busy() or self.loading:
+        if TTS.is_busy() or self.question is None:
             # question is still being read
             return GameState.TIE
         if not player_manager.green and not self.show_category:
@@ -190,12 +154,7 @@ class TieBreaker(State):
                     display_text(screen, text, Font.number, (100, 100, width-100, height-100))
                     self.buttons.continue_button.draw(screen, (width/2, height*3/4))
                     return
-                # draw correct/incorrect buttons
-                self.buttons.correct_button.draw(screen, (width*1/4, height*3/4))
-                self.buttons.wrong_button.draw(screen, (width*3/4, height*3/4))
-            else:
-                # draw continue button
-                self.buttons.continue_button.draw(screen, (width*1/2, height*3/4))
+            self.draw_buttons(screen)
             display_text(screen, text.upper(), Font.clue, (100, 100, width-100, height-100))
 
         elif self.show_category:
