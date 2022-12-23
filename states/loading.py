@@ -12,7 +12,6 @@ class LoadingScreen(State):
     """Game State that draws loading screen and loads questions.
 
     Attributes:
-        name (GameState): Enum that represents this game state
         text (Surface): Pygame surface where loading text is drawn
         data (dict of Any: dict): Nested dictionary of questions. Dictionary is indexed
             by round (1,2, or 'fj'), and then indexed again by category (str). Each category
@@ -21,7 +20,6 @@ class LoadingScreen(State):
     """
     def __init__(self):
         super().__init__()
-        self.name = GameState.LOADING
         self.text = Font.button.render("Loading...", True, Colors.WHITE)
         self.data = {}
         self.thread = None

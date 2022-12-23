@@ -10,7 +10,6 @@ class Hall(InputState):
     """Load and displays the top 10 all time high scorers."""
     def __init__(self):
         super().__init__()
-        self.name = GameState.HALL
         self.scores = []
         self.continue_button = Button('Return')
         self.enter_button = Button('Enter')

@@ -14,7 +14,6 @@ class Final(InputState):
     the correct response.
 
     Attributes:
-        name (GameState): Enum that represents this game state
         show_answer (boolean): True if the timer has expired and answer should be shown
         wait_for_wagers (boolean): True if players have not entered wagers yet
         play_sound (boolean): True if final theme should be played
@@ -24,7 +23,6 @@ class Final(InputState):
     """
     def __init__(self):
         super().__init__()
-        self.name = GameState.FINAL
         self.show_answer = False
         self.wait_for_wagers = True
         self.play_sound = False

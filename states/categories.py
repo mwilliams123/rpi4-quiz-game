@@ -10,13 +10,11 @@ class IntroScreen(State):
     Displays categories and introduces them using Text-to-Speech.
 
     Attributes:
-        name (GameState): Enum that represents this game state
         categories (list of str): List of category names to be introduced
         index (int): Index of the current category being introduced
     """
     def __init__(self):
         super().__init__()
-        self.name = GameState.INTRO
         self.categories = []
         self.index = 0
 

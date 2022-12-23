@@ -9,7 +9,6 @@ class Stats(State):
     """Class for displaying game stats at end of game."""
     def __init__(self):
         super().__init__()
-        self.name = GameState.STATS
         self.continue_button = Button('Return')
         self.stats = []
         self.triple_stumpers = 0

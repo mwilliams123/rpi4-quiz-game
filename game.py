@@ -41,6 +41,8 @@ class Game():
         self.game_board = pygame.Surface((1300, 1000))
         self.clock = pygame.time.Clock()
         self.states = states
+        for key in self.states.keys():
+            states[key].set_name(key)
         self.state = states[start_state]
         self.player_manager = PlayerManager()
         self.score_board = Score()

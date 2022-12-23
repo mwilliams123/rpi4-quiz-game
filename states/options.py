@@ -9,13 +9,11 @@ class OptionsScreen(State):
     """Game State that shows a simple Options screen and play button.
 
     Attributes:
-        name (GameState): Enum that represents this game state
         play_button (Button): Button that can be clicked to start game
         clicked (boolean): whether the mouse has been clicked
         """
     def __init__(self):
         super().__init__()
-        self.name = GameState.OPTIONS
         self.back = Button("Back")
         self.hosted_toggle = Button("OFF")
         self.num_players_toggle = Button("3")

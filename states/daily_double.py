@@ -14,13 +14,11 @@ class DailyDouble(InputState):
     was correct or not.
 
     Attributes:
-        name (GameState): Enum that represents this game state
         wager (int): Dollar amount the player would like to wager
         timer (int): Milliseconds left to respond to question
     """
     def __init__(self):
         super().__init__()
-        self.name = GameState.DAILY_DOUBLE
         self.wager = None
         self.timer = 6000
         self.show_answer = False

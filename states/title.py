@@ -9,13 +9,11 @@ class TitleScreen(State):
     """Game State that shows a simple title screen and play button.
 
     Attributes:
-        name (GameState): Enum that represents this game state
         play_button (Button): Button that can be clicked to start game
         clicked (boolean): whether the mouse has been clicked
         """
     def __init__(self):
         super().__init__()
-        self.name = GameState.TITLE
         self.play_button = Button("Play", Font.get_font(Font.BIG))
         self.hall_button = Button("Hall of Fame")
         self.options = Button("Options")

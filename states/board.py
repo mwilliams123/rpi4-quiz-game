@@ -14,7 +14,6 @@ class Board(State):
     clues on the board. Allows users to click on the next clue.
 
     Attributes:
-        name (GameState): Enum that represents this game state
         clicked (boolean): Whether the mouse has been clicked
         grid (list of int, list of int): Tuple (vertical_lines, horizontal_lines) of the
             lines used to draw the game board. Each line is represented by an integer that
@@ -23,7 +22,6 @@ class Board(State):
     """
     def __init__(self):
         super().__init__()
-        self.name = GameState.BOARD
         self.grid = ([], [])
         self.show_score = True
 

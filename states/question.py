@@ -11,7 +11,6 @@ class Question(State):
     and determining correctness of answers.
 
     Attributes:
-        name (GameState): Enum that represents this game state
         show_answer (boolean): True if the timer has expired and answer should be shown
         rang_in (boolean): True if any player has rung in
         clicked (boolean): True if the mouse has been clicked

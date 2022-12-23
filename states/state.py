@@ -18,6 +18,7 @@ class State():
     Abstract class for game states.
 
     Attributes:
+        name (GameState): Enum that represents this game state
         store (dict of str: Any): Dictionary of data that should be persistent and
             transfered from state to state
     """
@@ -25,7 +26,11 @@ class State():
         self.store = {}
         self.show_score = False
         self.clicked = False
+        self.name = None
 
+    def set_name(self, name):
+        """Set title for a game state."""
+        self.name = name
     def startup(self, store, _player_manager):
         """
         Executes once immediately after a state is transitioned into.
