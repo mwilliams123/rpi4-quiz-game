@@ -22,7 +22,7 @@ jobs:
     - name: Analysing the code with pylint
       id: score
       run: |
-        echo "##[set-output name=data;]$(pylint --unsafe-load-any-extension=y $(git ls-files '*.py') | sed -n 's/^Your code has been rated at \([-0-9.]*\)\/.*/\1/p')"
+        echo "##[set-output name=data;]$(pylint --extension-pkg-whitelist=pygame $(git ls-files '*.py') | sed -n 's/^Your code has been rated at \([-0-9.]*\)\/.*/\1/p')"
     - name: Badge
       uses: RubbaBoy/BYOB@v1.3.0
       with:
