@@ -27,6 +27,8 @@ jobs:
       with:
         name: pylintlog
         path: log.txt 
+    - name: Save output
+      run: pylint --extension-pkg-whitelist=pygame $(git ls-files '*.py') >> $GITHUB_STEP_SUMMARY
     - name: Badge
       uses: RubbaBoy/BYOB@v1.3.0
       with:
